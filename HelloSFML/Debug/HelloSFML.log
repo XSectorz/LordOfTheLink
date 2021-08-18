@@ -1,0 +1,6 @@
+﻿  Player.cpp
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(108,9): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(109,9): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(171,29): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(175,31): warning C4018: '<=': signed/unsigned mismatch
+  HelloSFML.vcxproj -> C:\Users\Computer\source\repos\HelloSFML\Debug\HelloSFML.exe
