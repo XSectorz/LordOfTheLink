@@ -1,7 +1,7 @@
 #include "Player.h"
 #include "TilemapHandler.h"
 #include <iostream>
-#include "MapHandler.h"
+#include "GameHandler.h"
 #include <cmath>
 
 using namespace std;
@@ -105,8 +105,8 @@ void Player::Update(float deltaTime) {
 
 		TilemapHandler Map = Maps[0];
 
-		int x = round(abs(vectArr.x));
-		int y = round(abs(vectArr.y));
+		int x = (int) round(abs(vectArr.x));
+		int y = (int) round(abs(vectArr.y));
 		
 		//sf::Vector2i CoorditionChecker(x + DataX, y + DataY);
 		sf::Vector2i CoorditionChecker(x, y);
@@ -169,11 +169,11 @@ void Player::Update(float deltaTime) {
 		for (sf::Vector2i coord : Coordition) {
 
 			if (Map.getVect().size() <= coord.y) {
-				break;
+				continue;
 			}
 
 			if(Map.getVect()[0].size() <= coord.x) {
-				break;
+				continue;
 			}
 
 			int BLOCK_STATS = Map.getVect()[coord.y][coord.x];

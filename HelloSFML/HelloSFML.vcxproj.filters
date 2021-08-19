@@ -33,7 +33,7 @@
     <ClCompile Include="Platform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MapHandler.cpp">
+    <ClCompile Include="GameHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +53,7 @@
     <ClInclude Include="Platform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MapHandler.h">
+    <ClInclude Include="GameHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

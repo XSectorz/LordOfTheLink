@@ -5,12 +5,14 @@
 #include "TilemapHandler.h"
 #include "Player.h"
 #include "Platform.h"
-#include "MapHandler.h"
+#include "GameHandler.h"
+#include <string>
 
 using namespace std;
 
 static const float VIEW_HEIGHT = 925.0f;
 static const float VIEW_WIDTH = 1024.0f;
+static const vector<string> MAP_0_BARRIER = { "0,0","19,10","6,8","1,1","2,2","0,1","1,0"};
 
 void ResizeView(const sf::RenderWindow& window, sf::View& view) {
     float aspectRation = float(window.getSize().x) / float(window.getSize().y);
@@ -19,9 +21,9 @@ void ResizeView(const sf::RenderWindow& window, sf::View& view) {
 
 void loadMap() {
 
-    TilemapHandler MapTest(0,1280.0f,1280.0f);
+    TilemapHandler MapTest(0, 1280.0f, 1280.0f,MAP_0_BARRIER); //โหลดเเมพ
 
-    Maps.push_back(MapTest);
+    Maps.push_back(MapTest); //นำเเมพเข้าข้อมูล
 
     for (TilemapHandler Map : Maps) {
         cout << "MAP ID: " << Map.getMapID() << endl;

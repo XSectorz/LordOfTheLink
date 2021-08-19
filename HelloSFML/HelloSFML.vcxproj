@@ -148,7 +148,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Collider.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="MapHandler.cpp" />
+    <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="TilemapHandler.cpp" />
@@ -156,7 +156,7 @@
   <ItemGroup>
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Collider.h" />
-    <ClInclude Include="MapHandler.h" />
+    <ClInclude Include="GameHandler.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TilemapHandler.h" />
