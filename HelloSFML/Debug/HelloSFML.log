@@ -1,4 +1,10 @@
-﻿  Player.cpp
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(171,29): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(175,31): warning C4018: '<=': signed/unsigned mismatch
+﻿  Animation.cpp
+  GameHandler.cpp
+  Player.cpp
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(170,29): warning C4018: '<=': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(174,31): warning C4018: '<=': signed/unsigned mismatch
+  main.cpp
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(133,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(202,27): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
   HelloSFML.vcxproj -> C:\Users\Computer\source\repos\HelloSFML\Debug\HelloSFML.exe

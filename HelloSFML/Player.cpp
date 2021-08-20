@@ -37,14 +37,13 @@ sf::Vector2f Player::getPrevposition() {
 	return this->prevPos;
 }
 
-void Player::Update(float deltaTime) {
+WalkTypes Player::Update(float deltaTime,int rotationType) {
 	sf::Vector2f movement(0.0f, 0.0f);
 	sf::Vector2f vectArr = getArrayPosition();
 
 	bool isWalking = false;
 
-	enum WalkTypes { LEFT, RIGHT, FORWARD, BACKWARD ,FORWARD_LEFT, FORWARD_RIGHT, BACKWARD_LEFT, BACKWARD_RIGHT};
-	WalkTypes WalkType = WalkTypes::LEFT;
+	WalkTypes WalkType = IDLE;
 
 	//row is Index of animation
 
@@ -56,25 +55,25 @@ void Player::Update(float deltaTime) {
 		isWalking = true;
 		DataX = -1;
 		WalkType = LEFT;
-	}
+	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 		row = 7; //Walking right
 		isWalking = true;
 		DataX = +1;
 		WalkType = RIGHT;
-	}
+	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		row = 6; //Walking backward
 		isWalking = true;
 		DataY = -1;
 		WalkType = BACKWARD;
-	}
+	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		isWalking = true;
 		DataY = +1;
 		row = 4; //Walking forward
 		WalkType = FORWARD;
-	}
+	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		row = 6;
 		isWalking = true;
@@ -114,7 +113,7 @@ void Player::Update(float deltaTime) {
 
 		sf::Vector2i vect = getBlockedCoordition();
 
-		cout << "(" << x << "," << y << ") -> Your position" << endl;
+		//cout << "(" << x << "," << y << ") -> Your position" << endl;
 		//cout << "(" << vect.x << "," << vect.y << ") || ARRAY : " << BLOCK_STATS << endl;
 
 		//cout << "X---->" << (0.0f) + (64.0f * vect.x) << "," << (0.0f) + (64.0f * vect.y) << endl;
@@ -178,76 +177,55 @@ void Player::Update(float deltaTime) {
 
 			int BLOCK_STATS = Map.getVect()[coord.y][coord.x];
 
-			cout << coord.x << "," << coord.y << " " << " -> " << BLOCK_STATS;
+			//cout << coord.x << "," << coord.y << " " << " -> " << BLOCK_STATS;
 
 			if (BLOCK_STATS == 1) {
 				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
 				Barrier2.Draw(windowRender);
 
-				if (Barrier2.GetCollinder().CheckCollision(player.GetCollinder())) {
-					cout << " -> INTERSECT";
+				if (Barrier2.GetCollinder().CheckCollision(player.GetCollinder())) { //Intersect Barrier
 					isCanWalk = false;
 				}
 			}
 
-			cout << endl;
+			//cout << endl;
 		}
 
 		if (isCanWalk) {
-			switch (WalkType) {
-			case LEFT:
+			if (WalkType == LEFT) {
 				movement.x -= speed * deltaTime;
-				break;
-			case RIGHT:
+			} else if (WalkType == RIGHT) {
 				movement.x += speed * deltaTime;
-				break;
-			case FORWARD:
+			} else if (WalkType == FORWARD) {
 				movement.y += speed * deltaTime;
-				break;
-			case BACKWARD:
+			} else if (WalkType == BACKWARD) {
 				movement.y -= speed * deltaTime;
-				break;
-			case FORWARD_LEFT:
+			} else if (WalkType == FORWARD_LEFT) {
 				movement.x -= speed * deltaTime;
 				movement.y += speed * deltaTime;
-				break;
-			case FORWARD_RIGHT:
+			} else if (WalkType == FORWARD_RIGHT) {
 				movement.x += speed * deltaTime;
 				movement.y += speed * deltaTime;
-				break;
-			case BACKWARD_LEFT:
+			} else if (WalkType == BACKWARD_LEFT) {
 				movement.x -= speed * deltaTime;
 				movement.y -= speed * deltaTime;
-				break;
-			case BACKWARD_RIGHT:
+			} else if (WalkType == BACKWARD_RIGHT) {
 				movement.x += speed * deltaTime;
 				movement.y -= speed * deltaTime;
-				break;
-			default:
-				break;
 			}
 		}
 	}
 
-	if (row == 4) {
-		if (this->prevPos == this->body.getPosition()) {
+
+	if (this->prevPos == this->body.getPosition()) {
+		if (row == 4 || rotationType == 1) {
 			row = 0;
-			printf("IDLE AT 0\n");
-		}
-	} else if (row == 6) {
-		if (this->prevPos == this->body.getPosition()) {
+		} else if (row == 6 || rotationType == 3) {
 			row = 2;
-			printf("IDLE AT 2\n");
-		}
-	} else if (row == 7) {
-		if (this->prevPos == this->body.getPosition()) {
+		} else if (row == 7 || rotationType == 4) {
 			row = 3;
-			printf("IDLE AT 3\n");
-		}
-	} else if (row == 5) {
-		if (this->prevPos == this->body.getPosition()) {
+		} else if (row == 5 || rotationType == 2) {
 			row = 1;
-			printf("IDLE AT 3\n");
 		}
 	}
 
@@ -286,4 +264,5 @@ void Player::Update(float deltaTime) {
 	animation.Update(row, deltaTime);
 	body.setTextureRect(animation.uvRect);
 	body.move(movement);
+	return WalkType;
 }

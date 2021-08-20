@@ -3,13 +3,16 @@
 #include "Animation.h"
 #include "Collider.h"
 
+enum WalkTypes { LEFT, RIGHT, FORWARD, BACKWARD, FORWARD_LEFT, FORWARD_RIGHT, BACKWARD_LEFT, BACKWARD_RIGHT, IDLE};
+
 class Player
 {
+
 public:
 	Player(sf::Texture* texture,sf::Vector2u imageCount,float switchTime,float speed);
 	//Player(sf::Texture* texture);
 	
-	void Update(float deltaTime);
+	WalkTypes Update(float deltaTime,int rotationType);
 	void setPrevposition(sf::Vector2f prevPos);
 	sf::Vector2f getArrayPosition();
 	sf::Vector2f getPrevposition();
