@@ -17,6 +17,8 @@ public:
 	sf::Vector2f getArrayPosition();
 	sf::Vector2f getPrevposition();
 	sf::RectangleShape getBody() { return body; }
+	sf::RectangleShape getHitbox() { return hitbox; }
+
 	sf::Vector2f getCurrentPosition() { return body.getPosition(); }
 	sf::Vector2i getBlockedCoordition() { return BlockedArea; }
 	void setBlockedCoordition(sf::Vector2i BlockedArea) {
@@ -24,10 +26,11 @@ public:
 			
 	};
 
-	Collider GetCollinder() { return Collider(body); }
+	Collider GetCollinder() { return Collider(hitbox); }
 
 private:
 	sf::RectangleShape body;
+	sf::RectangleShape hitbox;
 	Animation animation;
 	unsigned int row;
 	float speed;

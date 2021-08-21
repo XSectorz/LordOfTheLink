@@ -15,6 +15,7 @@ bool Collider::CheckCollision(Collider other) {
     sf::Vector2f thisPosition = GetPosition();
     sf::Vector2f thisHalfSize = GetHalfSize();
     sf::RectangleShape thisBody = GetBody();
+
     //cout << "OTHER POSITION: " << otherPosition.x << " " << otherPosition.y << " OTHER HALF SIZE: " << other.GetHalfSize().x << "," << other.GetHalfSize().y << endl;
     //cout << "THIS POSITION: " << thisPosition.x << " " << thisPosition.y << " THIS HALF SIZE: " << GetHalfSize().x << "," << GetHalfSize().y  << endl;
 

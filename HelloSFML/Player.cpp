@@ -14,9 +14,12 @@ Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, 
 	row = 0;
 
 	body.setPosition(700.0f, 480.0f);
+	hitbox.setPosition(700.0f, 480.0f);
 	body.setSize(sf::Vector2f(57.0f, 64.0f));
+	hitbox.setSize(sf::Vector2f(32.0f, 54.0f));
 	body.setTexture(texture);
 	body.setOrigin(body.getSize() / 2.0f);
+	hitbox.setOrigin(hitbox.getSize() / 2.0f);
 	body.setTextureRect(sf::IntRect(0, 0, 60, 66));
 }
 
@@ -108,10 +111,10 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 		int y = (int) round(abs(vectArr.y));
 		
 		//sf::Vector2i CoorditionChecker(x + DataX, y + DataY);
-		sf::Vector2i CoorditionChecker(x, y);
-		setBlockedCoordition(CoorditionChecker);
+		//sf::Vector2i CoorditionChecker(x, y);
+		//setBlockedCoordition(CoorditionChecker);
 
-		sf::Vector2i vect = getBlockedCoordition();
+		//sf::Vector2i vect = getBlockedCoordition();
 
 		//cout << "(" << x << "," << y << ") -> Your position" << endl;
 		//cout << "(" << vect.x << "," << vect.y << ") || ARRAY : " << BLOCK_STATS << endl;
@@ -181,10 +184,14 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 
 			if (BLOCK_STATS == 1) {
 				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
+
+				//cout << "Draw: " << (64.0f * coord.x) << " " << (64.0f * coord.y) << endl;
+
 				Barrier2.Draw(windowRender);
 
 				if (Barrier2.GetCollinder().CheckCollision(player.GetCollinder())) { //Intersect Barrier
 					isCanWalk = false;
+					break;
 				}
 			}
 
@@ -264,5 +271,6 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 	animation.Update(row, deltaTime);
 	body.setTextureRect(animation.uvRect);
 	body.move(movement);
+	hitbox.move(movement);
 	return WalkType;
 }

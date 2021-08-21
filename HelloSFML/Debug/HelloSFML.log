@@ -1,10 +1,19 @@
-﻿  Animation.cpp
-  GameHandler.cpp
-  Player.cpp
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(170,29): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\Player.cpp(174,31): warning C4018: '<=': signed/unsigned mismatch
-  main.cpp
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(133,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(202,27): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
+﻿  main.cpp
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(93,32): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(94,32): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(96,43): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(96,35): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(108,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(163,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(237,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(248,31): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(264,27): warning C4018: '<': signed/unsigned mismatch
   HelloSFML.vcxproj -> C:\Users\Computer\source\repos\HelloSFML\Debug\HelloSFML.exe

@@ -10,12 +10,14 @@
 #include <cmath>
 #include <string>
 #include <vector>
+#include "Enemies.h"
+#include <time.h> 
 
 using namespace std;
 
 static const float VIEW_HEIGHT = 925.0f;
 static const float VIEW_WIDTH = 1024.0f;
-static const vector<string> MAP_0_BARRIER = { "0,0","19,10","6,8","1,1","2,2","0,1","1,0"};
+static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","9,6","9,7","16,6","15,8","15,9","18,10","4,12" ,"4,11","2,13","7,13","12,17","12,16","15,16" };
 
 class Arrow {
   
@@ -28,7 +30,8 @@ public:
     Arrow()
         : currVelocity(0.f, 0.f), maxSpeed(15.f)
     {   
-        this->arrow.setSize(sf::Vector2f(10.0f, 10.0f));
+        this->arrow.setSize(sf::Vector2f(40.0f, 40.0f));
+        this->arrow.setOrigin(this->arrow.getSize()/2.0f);
         this->arrow.setFillColor(sf::Color::Red);
     };
 
@@ -77,9 +80,32 @@ int getRotationType(float rotation) {
     }
 }
 
+void spawnEnimies(vector<Enemies>* enemies_list) {
+
+    for (int i = 0; i < 5; i++) {
+        int CoordX, CoordY;
+        CoordX = rand() % ((int) Maps[0].getWidth()) + 0;
+        CoordY = rand() % ((int)Maps[0].getHeight()) + 0;
+
+        cout << "Enemy: " << i + 1 << " (" << CoordX << "," << CoordY << ") " << endl;
+
+        sf::Vector2f speed;
+        speed.x = rand() % (5) + 1;
+        speed.y = rand() % (5) + 1;
+
+        Enemies enemy(32.0f,32.0f,CoordX, CoordY, speed);
+
+        enemies_list->push_back(enemy);
+    }
+
+}
+
 int main()
 {
     windowRender.setFramerateLimit(60);
+
+    /* initialize random seed: */
+    srand(time(NULL));
 
     /* LOADING TEXTURE */
 
@@ -119,6 +145,10 @@ int main()
     Arrow arrow1;
     vector<Arrow> arrows;
 
+    /* ENEMEIS */
+    vector<Enemies> enemies_list;
+    spawnEnimies(&enemies_list);
+
     while (windowRender.isOpen()) {
         sf::Event event;
 
@@ -140,6 +170,7 @@ int main()
         windowRender.setView(view);
 
         windowRender.draw(player.getBody());
+       // windowRender.draw(player.getHitbox());
 
         Test.setPosition(player.getBody().getPosition());
 
@@ -173,6 +204,9 @@ int main()
             {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
+
+                    //cout << " window: " << Maps[0].getHeight() << "," << Maps[0].getWidth() << endl;
+
                     bool isAllowShoot = true;
 
                     if ((walkType == BACKWARD || walkType == BACKWARD_LEFT || walkType == BACKWARD_RIGHT)  && (RotationType != 3 && RotationType != 0)) {
@@ -199,8 +233,11 @@ int main()
             }
         }
 
+        /* MOVING ARROW */
         for (int i = 0; i < arrows.size(); i++) {
             arrows[i].arrow.move(arrows[i].currVelocity);
+
+            bool isHitEnemy = false;
 
             if (arrows[i].arrow.getPosition().x < 0 || arrows[i].arrow.getPosition().y < 0
                 || arrows[i].arrow.getPosition().x > Maps[0].getWidth() || arrows[i].arrow.getPosition().y > Maps[0].getHeight()) {
@@ -208,10 +245,28 @@ int main()
                 continue;
             }
 
-            windowRender.draw(arrows[i].arrow);
+            for (int j = 0; j < enemies_list.size(); j++) {
+                if (enemies_list[j].GetCollinder().CheckCollision(arrows[i].GetCollinder())) {
+                    enemies_list.erase(enemies_list.begin() + j);
+                    arrows.erase(arrows.begin() + i);
+                    isHitEnemy = true;
+                    break;
+                }
+            }
+
+            if (!isHitEnemy) {
+                windowRender.draw(arrows[i].arrow);
+            }
         }
 
         windowRender.draw(Test);
+
+        for (int i = 0; i < enemies_list.size(); i++) {
+            windowRender.draw(enemies_list[i].getBody());
+
+            enemies_list[i].Update(player.getBody().getPosition());
+        }
+
         windowRender.display();
     }
 
