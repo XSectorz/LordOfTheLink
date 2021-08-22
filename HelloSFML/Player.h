@@ -3,7 +3,7 @@
 #include "Animation.h"
 #include "Collider.h"
 
-enum WalkTypes { LEFT, RIGHT, FORWARD, BACKWARD, FORWARD_LEFT, FORWARD_RIGHT, BACKWARD_LEFT, BACKWARD_RIGHT, IDLE};
+enum class WalkTypes { LEFT, RIGHT, FORWARD, BACKWARD, FORWARD_LEFT, FORWARD_RIGHT, BACKWARD_LEFT, BACKWARD_RIGHT, IDLE};
 
 class Player
 {
@@ -20,11 +20,6 @@ public:
 	sf::RectangleShape getHitbox() { return hitbox; }
 
 	sf::Vector2f getCurrentPosition() { return body.getPosition(); }
-	sf::Vector2i getBlockedCoordition() { return BlockedArea; }
-	void setBlockedCoordition(sf::Vector2i BlockedArea) {
-		this->BlockedArea = BlockedArea;
-			
-	};
 
 	Collider GetCollinder() { return Collider(hitbox); }
 
@@ -35,6 +30,5 @@ private:
 	unsigned int row;
 	float speed;
 	sf::Vector2f prevPos;
-	sf::Vector2i BlockedArea;
 };
 

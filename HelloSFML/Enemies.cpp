@@ -43,7 +43,7 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 		//cout << "NOT MOVE" << endl;
 	} else {
 
-		WalkTypes walk = LEFT;
+		WalkTypes walk = WalkTypes::LEFT;
 
 		int temp_EnemyX = round(EnemyPosition.x);
 		int temp_EnemyY = round(EnemyPosition.y);
@@ -55,35 +55,35 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 
 		if (temp_EnemyX > temp_prevPosEnemyX && temp_EnemyY == temp_prevPosEnemyY) { //เคลื่อนที่ไปทางขวา
 			//cout << "Move Right" << endl;
-			walk = RIGHT;
+			walk = WalkTypes::RIGHT;
 		}
 		else if (temp_EnemyX > temp_prevPosEnemyX && temp_EnemyY < temp_prevPosEnemyY) { //เคลื่อนที่ไปทางขวาเฉียงขึ้น
 			//cout << "Move UP AND Right" << endl;
-			walk = BACKWARD_RIGHT;
+			walk = WalkTypes::BACKWARD_RIGHT;
 		}
 		else if (temp_EnemyX > temp_prevPosEnemyX && temp_EnemyY > temp_prevPosEnemyY) { //เคลื่อนที่ไปทางขวาเฉียงลง
 			//cout << "Move DOWN AND Right" << endl;
-			walk = FORWARD_RIGHT;
+			walk = WalkTypes::FORWARD_RIGHT;
 		}
 		else if (temp_EnemyX == temp_prevPosEnemyX && temp_EnemyY > temp_prevPosEnemyY) { //เคลื่อนที่ลง
 			//cout << "Move DOWN" << endl;
-			walk = FORWARD;
+			walk = WalkTypes::FORWARD;
 		}
 		else if (temp_EnemyX == temp_prevPosEnemyX && temp_EnemyY < temp_prevPosEnemyY) { //เคลื่อนที่ขึ้น
 			//cout << "Move UP" << endl;
-			walk = BACKWARD;
+			walk = WalkTypes::BACKWARD;
 		}
 		else if (temp_EnemyX< temp_prevPosEnemyX && temp_EnemyY > temp_prevPosEnemyY) { //เคลื่อนที่ไปทางซ้ายเฉียงลง
 			//cout << "Move DOWN AND LEFT" << endl;
-			walk = FORWARD_LEFT;
+			walk = WalkTypes::FORWARD_LEFT;
 		}
 		else if (temp_EnemyX < temp_prevPosEnemyX && temp_EnemyY < temp_prevPosEnemyY) { //เคลื่อนที่ไปทางซ้ายเฉียงขึ้น
 		//	cout << "Move UP AND LEFT" << endl;
-			walk = BACKWARD_LEFT;
+			walk = WalkTypes::BACKWARD_LEFT;
 		}
 		else if (temp_EnemyX < temp_prevPosEnemyX && temp_EnemyY == temp_prevPosEnemyY) { //เคลื่อนที่ไปทางซ้าย
 			//cout << "Move LEFT" << endl;
-			walk = LEFT;
+			walk = WalkTypes::LEFT;
 		}
 
 		vector<sf::Vector2i> Coordition;
@@ -94,29 +94,49 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 		int x = (int)round(abs(vectArr.x));
 		int y = (int)round(abs(vectArr.y));
 
+		//cout << "ARRAY: " << x << "," << y << endl;
+		//cout << "POSITION: " << this->body.getPosition().x << "," << this->body.getPosition().y << endl;
+		//cout << "----------------" << endl;
+
 		for (int i = 1; i <= 3; i++) { //Forward hitbox
 
-			if (walk == LEFT || walk == RIGHT || walk == FORWARD || walk == BACKWARD) {
+			if (walk == WalkTypes::LEFT || walk == WalkTypes::RIGHT || walk == WalkTypes::FORWARD || walk == WalkTypes::BACKWARD) {
 				if (i == 1) {
 					continue;
 				}
 			}
-			if (walk == LEFT) {
+			if (walk == WalkTypes::LEFT) {
 				indexX = (x - 1);
 				indexY = (y - 2) + i;
 			}
-			else if (walk == RIGHT) {
+			else if (walk == WalkTypes::RIGHT) {
 				indexX = (x + 1);
 				indexY = (y - 2) + i;
 			}
-			else if (walk == FORWARD || walk == FORWARD_LEFT || walk == FORWARD_RIGHT) {
+			else if (walk == WalkTypes::FORWARD || walk == WalkTypes::FORWARD_LEFT || walk == WalkTypes::FORWARD_RIGHT) {
 				indexX = (x - 2) + i;
 				indexY = (y + 1);
 			}
-			else if (walk == BACKWARD || walk == BACKWARD_LEFT || walk == BACKWARD_RIGHT) {
+			else if (walk == WalkTypes::BACKWARD || walk == WalkTypes::BACKWARD_LEFT || walk == WalkTypes::BACKWARD_RIGHT) {
 				indexX = (x - 2) + i;
 				indexY = (y - 1);
 			}
+			sf::Vector2i temp_Coordition(indexX, indexY);
+			Coordition.push_back(temp_Coordition);
+		}
+
+		for (int i = 1; i <= 3; i++) {
+			if (i == 2) {
+				continue;
+			}
+			if (walk == WalkTypes::FORWARD_LEFT || walk == WalkTypes::FORWARD_RIGHT || walk == WalkTypes::BACKWARD_LEFT || walk == WalkTypes::BACKWARD_RIGHT) {
+				indexX = (x - 2) + i;
+				indexY = y;
+			}
+			else {
+				break;
+			}
+
 			sf::Vector2i temp_Coordition(indexX, indexY);
 			Coordition.push_back(temp_Coordition);
 		}
@@ -138,15 +158,89 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 			if (BLOCK_STATS == 1) {
 				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
 
+				//windowRender.draw(Barrier2.getBody());
+
 				if (Barrier2.GetCollinder().CheckCollision(GetCollinder())) { //Intersect Barrier
-					return;
+					//cout << "Im Stuck! and ";
+
+					/* INTELLIGENT MOVEMENT */
+					int BLOCK_STATS_2 = 0;
+					int BLOCK_STATS_CURRENT_POSITION = 0;
+
+					WalkTypes walkT = WalkTypes::LEFT;
+
+					if (x <= 0 || x >= Map.getVect()[0].size()) {
+						return;
+					}
+
+					BLOCK_STATS_CURRENT_POSITION = Map.getVect()[y][x];
+
+					if (EnemyPosition.x < player.getCurrentPosition().x) {
+						//cout << " Player are right! ";
+						BLOCK_STATS_2 = Map.getVect()[y][x+1];
+						walkT = WalkTypes::RIGHT;
+
+					} else if (EnemyPosition.x > player.getCurrentPosition().x) {
+						//cout << " Player are left! ";
+						BLOCK_STATS_2 = Map.getVect()[y][x-1];
+						walkT = WalkTypes::LEFT;
+					}
+
+					//cout << "My position: " << x << "," << y << " IS BLOCK: " << BLOCK_STATS_2 << endl;
+					sf::Vector2f Intelligent_Movement(temp_prevPosEnemyX, temp_prevPosEnemyY);
+
+					if (BLOCK_STATS_2 == 0 && BLOCK_STATS_CURRENT_POSITION == 0) { // Check left And Right
+
+						//cout << "-----> CAN MOVE : x = " << Intelligent_Movement.x << " ";
+						//cout << "-----> CAN MOVE : ";
+						if (walkT == WalkTypes::RIGHT) {
+							Intelligent_Movement.x = Intelligent_Movement.x + 2;
+							//cout << "RIGHT" << endl;
+						} else if (walkT == WalkTypes::LEFT) {
+							Intelligent_Movement.x = Intelligent_Movement.x - 2;
+							//cout << "LEFT" << endl;
+						}
+						//cout << "| x = " << Intelligent_Movement.x << " " << endl;;
+
+						body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+						this->prevPos = Intelligent_Movement;
+						return;
+					} else {
+						//cout << "-----> CANT MOVE LEFT & RIGHT IM TRYING TO MOVE UP & DOWN" << endl;
+						if (EnemyPosition.y < player.getCurrentPosition().y) {
+							//cout << " Player are down! ";
+							BLOCK_STATS_2 = Map.getVect()[y+1][x];
+							walkT = WalkTypes::BACKWARD;
+
+						} else if (EnemyPosition.y > player.getCurrentPosition().y) {
+							//cout << " Player are up " << endl;
+							BLOCK_STATS_2 = Map.getVect()[y-1][x];
+							walkT = WalkTypes::FORWARD;
+						}
+
+						if (BLOCK_STATS_2 == 0 && BLOCK_STATS_CURRENT_POSITION == 0) { // Check lup & Down
+							//cout << "------> I CAN MOVE! ";
+							if (walkT == WalkTypes::BACKWARD) {
+								Intelligent_Movement.y = Intelligent_Movement.y + 2;
+								//cout << "DOWN" << endl;
+							}
+							else if (walkT == WalkTypes::FORWARD) {
+								Intelligent_Movement.y = Intelligent_Movement.y - 2;
+								//cout << "UP" << endl;
+							}
+
+							body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+							this->prevPos = Intelligent_Movement;
+							return;
+						}
+						//cout << "-----> I CANT DO ANYTHING BRUH"  << endl;
+						return;
+					}
 				}
 			}
 		}
 	}
-
 	this->prevPos = EnemyPosition;
-
 	if (GetCollinder().CheckCollision(player.GetCollinder())) {
 		//cout << "Attack. " << endl;
 		return;

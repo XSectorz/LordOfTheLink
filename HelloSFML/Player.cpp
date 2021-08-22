@@ -46,7 +46,7 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 
 	bool isWalking = false;
 
-	WalkTypes WalkType = IDLE;
+	WalkTypes WalkType = WalkTypes::IDLE;
 
 	//row is Index of animation
 
@@ -57,49 +57,49 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 		row = 5; //Walking left
 		isWalking = true;
 		DataX = -1;
-		WalkType = LEFT;
+		WalkType = WalkTypes::LEFT;
 	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 		row = 7; //Walking right
 		isWalking = true;
 		DataX = +1;
-		WalkType = RIGHT;
+		WalkType = WalkTypes::RIGHT;
 	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		row = 6; //Walking backward
 		isWalking = true;
 		DataY = -1;
-		WalkType = BACKWARD;
+		WalkType = WalkTypes::BACKWARD;
 	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		isWalking = true;
 		DataY = +1;
 		row = 4; //Walking forward
-		WalkType = FORWARD;
+		WalkType = WalkTypes::FORWARD;
 	} 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		row = 6;
 		isWalking = true;
 		DataY = -1;
-		WalkType = BACKWARD_LEFT;
+		WalkType = WalkTypes::BACKWARD_LEFT;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
 		row = 6;
 		isWalking = true;
 		DataY = -1;
-		WalkType = BACKWARD_RIGHT;
+		WalkType = WalkTypes::BACKWARD_RIGHT;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::A) && sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		row = 4;
 		isWalking = true;
 		DataY = +1;
-		WalkType = FORWARD_LEFT;
+		WalkType = WalkTypes::FORWARD_LEFT;
 	}
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::D) && sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
 		row = 4;
 		isWalking = true;
 		DataY = +1;
-		WalkType = FORWARD_RIGHT;
+		WalkType = WalkTypes::FORWARD_RIGHT;
 	}
 
 	if (isWalking) {
@@ -109,12 +109,6 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 
 		int x = (int) round(abs(vectArr.x));
 		int y = (int) round(abs(vectArr.y));
-		
-		//sf::Vector2i CoorditionChecker(x + DataX, y + DataY);
-		//sf::Vector2i CoorditionChecker(x, y);
-		//setBlockedCoordition(CoorditionChecker);
-
-		//sf::Vector2i vect = getBlockedCoordition();
 
 		//cout << "(" << x << "," << y << ") -> Your position" << endl;
 		//cout << "(" << vect.x << "," << vect.y << ") || ARRAY : " << BLOCK_STATS << endl;
@@ -130,22 +124,22 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 
 		for (int i = 1; i <= 3; i++) { //Forward hitbox
 
-			if (WalkType == LEFT || WalkType == RIGHT || WalkType == FORWARD || WalkType == BACKWARD) {
+			if (WalkType == WalkTypes::LEFT || WalkType == WalkTypes::RIGHT || WalkType == WalkTypes::FORWARD || WalkType == WalkTypes::BACKWARD) {
 				if (i == 1) {
 					continue; //เช็คเเค่ 2 บล็อคกันผู้เล่นเดินระหว่างตรงกลาง
 				}
 			}
 
-			if (WalkType == LEFT) {
+			if (WalkType == WalkTypes::LEFT) {
 				indexX = (x - 1);
 				indexY = (y - 2) + i;
-			} else if (WalkType == RIGHT) {
+			} else if (WalkType == WalkTypes::RIGHT) {
 				indexX = (x + 1);
 				indexY = (y - 2 ) + i;
-			} else if (WalkType == FORWARD || WalkType == FORWARD_LEFT || WalkType == FORWARD_RIGHT) {
+			} else if (WalkType == WalkTypes::FORWARD || WalkType == WalkTypes::FORWARD_LEFT || WalkType == WalkTypes::FORWARD_RIGHT) {
 				indexX = (x - 2) + i;
 				indexY = (y + 1);
-			} else if (WalkType == BACKWARD || WalkType == BACKWARD_LEFT || WalkType == BACKWARD_RIGHT) {
+			} else if (WalkType == WalkTypes::BACKWARD || WalkType == WalkTypes::BACKWARD_LEFT || WalkType == WalkTypes::BACKWARD_RIGHT) {
 				indexX = (x - 2) + i;
 				indexY = (y - 1);
 			}
@@ -157,7 +151,7 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 			if (i == 2) {
 				continue;
 			}
-			if (WalkType == FORWARD_LEFT || WalkType == FORWARD_RIGHT || WalkType == BACKWARD_LEFT || WalkType == BACKWARD_RIGHT) {
+			if (WalkType == WalkTypes::FORWARD_LEFT || WalkType == WalkTypes::FORWARD_RIGHT || WalkType == WalkTypes::BACKWARD_LEFT || WalkType == WalkTypes::BACKWARD_RIGHT) {
 				indexX = (x - 2) + i;
 				indexY = y;
 			} else {
@@ -185,8 +179,6 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 			if (BLOCK_STATS == 1) {
 				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
 
-				//cout << "Draw: " << (64.0f * coord.x) << " " << (64.0f * coord.y) << endl;
-
 				Barrier2.Draw(windowRender);
 
 				if (Barrier2.GetCollinder().CheckCollision(player.GetCollinder())) { //Intersect Barrier
@@ -199,24 +191,24 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 		}
 
 		if (isCanWalk) {
-			if (WalkType == LEFT) {
+			if (WalkType == WalkTypes::LEFT) {
 				movement.x -= speed * deltaTime;
-			} else if (WalkType == RIGHT) {
+			} else if (WalkType == WalkTypes::RIGHT) {
 				movement.x += speed * deltaTime;
-			} else if (WalkType == FORWARD) {
+			} else if (WalkType == WalkTypes::FORWARD) {
 				movement.y += speed * deltaTime;
-			} else if (WalkType == BACKWARD) {
+			} else if (WalkType == WalkTypes::BACKWARD) {
 				movement.y -= speed * deltaTime;
-			} else if (WalkType == FORWARD_LEFT) {
+			} else if (WalkType == WalkTypes::FORWARD_LEFT) {
 				movement.x -= speed * deltaTime;
 				movement.y += speed * deltaTime;
-			} else if (WalkType == FORWARD_RIGHT) {
+			} else if (WalkType == WalkTypes::FORWARD_RIGHT) {
 				movement.x += speed * deltaTime;
 				movement.y += speed * deltaTime;
-			} else if (WalkType == BACKWARD_LEFT) {
+			} else if (WalkType == WalkTypes::BACKWARD_LEFT) {
 				movement.x -= speed * deltaTime;
 				movement.y -= speed * deltaTime;
-			} else if (WalkType == BACKWARD_RIGHT) {
+			} else if (WalkType == WalkTypes::BACKWARD_RIGHT) {
 				movement.x += speed * deltaTime;
 				movement.y -= speed * deltaTime;
 			}

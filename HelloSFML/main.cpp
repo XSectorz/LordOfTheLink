@@ -17,7 +17,7 @@ using namespace std;
 
 static const float VIEW_HEIGHT = 925.0f;
 static const float VIEW_WIDTH = 1024.0f;
-static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","9,6","9,7","16,6","15,8","15,9","18,10","4,12" ,"4,11","2,13","7,13","12,17","12,16","15,16" };
+static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","9,7","16,6","15,8","15,9","18,10","4,12" ,"4,11","2,13","7,13","12,17","12,16","15,16" };
 
 class Arrow {
   
@@ -90,10 +90,10 @@ void spawnEnimies(vector<Enemies>* enemies_list) {
         cout << "Enemy: " << i + 1 << " (" << CoordX << "," << CoordY << ") " << endl;
 
         sf::Vector2f speed;
-        speed.x = rand() % (5) + 1;
-        speed.y = rand() % (5) + 1;
+        speed.x = rand() % (2) + 1;
+        speed.y = rand() % (2) + 1;
 
-        Enemies enemy(32.0f,32.0f,CoordX, CoordY, speed);
+        Enemies enemy(45.0f,45.0f,CoordX, CoordY, speed);
 
         enemies_list->push_back(enemy);
     }
@@ -112,7 +112,12 @@ int main()
     MapHandler::loadTexture();
 
     sf::Texture Map;
-    if (!Map.loadFromFile("TestMap2.png")) {
+    if (!Map.loadFromFile("TestMap3.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
+    sf::Texture Map2;
+    if (!Map2.loadFromFile("TestMap2_1.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
@@ -125,6 +130,10 @@ int main()
     sf::RectangleShape MapBackground(sf::Vector2f(1280.0f, 1280.0f));
     MapBackground.setTexture(&Map);
     MapBackground.setPosition(sf::Vector2f(0.0f, 0.0f));
+
+    sf::RectangleShape MapBackgroundAssest(sf::Vector2f(1280.0f, 1280.0f));
+    MapBackgroundAssest.setTexture(&Map2);
+    MapBackgroundAssest.setPosition(sf::Vector2f(0.0f, 0.0f));
 
     sf::RectangleShape Test(sf::Vector2f(160.0f, 128.0f));
     Test.setOrigin(Test.getSize() / 2.0f);
@@ -156,7 +165,6 @@ int main()
 
         view.setCenter(player.getCurrentPosition());
         windowRender.clear(sf::Color::Yellow);
-        windowRender.draw(MapBackground);
 
         float dx = mousePosWindow.x - player.getBody().getPosition().x;
         float dy = mousePosWindow.y - player.getBody().getPosition().y;
@@ -169,7 +177,6 @@ int main()
 
         windowRender.setView(view);
 
-        windowRender.draw(player.getBody());
        // windowRender.draw(player.getHitbox());
 
         Test.setPosition(player.getBody().getPosition());
@@ -178,6 +185,9 @@ int main()
         RotationType = getRotationType(rotation);
 
         WalkTypes walkType = player.Update(deltaTime, RotationType);
+
+        windowRender.draw(MapBackground);
+        windowRender.draw(player.getBody());
 
         while (windowRender.pollEvent(event)) {
 
@@ -209,13 +219,13 @@ int main()
 
                     bool isAllowShoot = true;
 
-                    if ((walkType == BACKWARD || walkType == BACKWARD_LEFT || walkType == BACKWARD_RIGHT)  && (RotationType != 3 && RotationType != 0)) {
+                    if ((walkType == WalkTypes::BACKWARD || walkType == WalkTypes::BACKWARD_LEFT || walkType == WalkTypes::BACKWARD_RIGHT)  && (RotationType != 3 && RotationType != 0)) {
                         isAllowShoot = false;
-                    } else if ((walkType == RIGHT) && (RotationType != 4 && RotationType != 0)) {
+                    } else if ((walkType == WalkTypes::RIGHT) && (RotationType != 4 && RotationType != 0)) {
                         isAllowShoot = false;
-                    } else if (walkType == LEFT && (RotationType != 2 && RotationType != 0)) {
+                    } else if (walkType == WalkTypes::LEFT && (RotationType != 2 && RotationType != 0)) {
                         isAllowShoot = false;
-                    } else if ((walkType == FORWARD || walkType == FORWARD_LEFT || walkType == FORWARD_RIGHT) && (RotationType != 1 && RotationType != 0)) {
+                    } else if ((walkType == WalkTypes::FORWARD || walkType == WalkTypes::FORWARD_LEFT || walkType == WalkTypes::FORWARD_RIGHT) && (RotationType != 1 && RotationType != 0)) {
                         isAllowShoot = false;
                     }
                    
@@ -267,6 +277,7 @@ int main()
             enemies_list[i].Update(player.getBody().getPosition());
         }
 
+        windowRender.draw(MapBackgroundAssest);
         windowRender.display();
     }
 
