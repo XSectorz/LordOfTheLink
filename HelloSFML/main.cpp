@@ -19,8 +19,10 @@ static const float VIEW_HEIGHT = 925.0f;
 static const float VIEW_WIDTH = 1024.0f;
 static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","9,7","16,6","15,8","15,9","18,10","4,12" ,"4,11","2,13","7,13","12,17","12,16","15,16" };
 
+static sf::Texture mobTexture;
+
 class Arrow {
-  
+
 public:
     sf::RectangleShape arrow;
     sf::Vector2f currVelocity;
@@ -29,9 +31,9 @@ public:
 
     Arrow()
         : currVelocity(0.f, 0.f), maxSpeed(15.f)
-    {   
+    {
         this->arrow.setSize(sf::Vector2f(40.0f, 40.0f));
-        this->arrow.setOrigin(this->arrow.getSize()/2.0f);
+        this->arrow.setOrigin(this->arrow.getSize() / 2.0f);
         this->arrow.setFillColor(sf::Color::Red);
     };
 
@@ -46,9 +48,9 @@ void ResizeView(const sf::RenderWindow& window, sf::View& view) {
 
 void loadMap() {
 
-    TilemapHandler MapTest(0, 1280.0f, 1280.0f, MAP_0_BARRIER); //โหลดเเมพ
+    TilemapHandler MapTest(0, 1280.0f, 1280.0f, MAP_0_BARRIER);
 
-    Maps.push_back(MapTest); //นำเเมพเข้าข้อมูล
+    Maps.push_back(MapTest);
 
     for (TilemapHandler Map : Maps) {
         cout << "MAP ID: " << Map.getMapID() << endl;
@@ -71,20 +73,23 @@ void loadMap() {
 int getRotationType(float rotation) {
     if (rotation >= 45 && rotation < 135) {
         return 1; //forward
-    } else if (rotation >= 135 || rotation < -135) {
+    }
+    else if (rotation >= 135 || rotation < -135) {
         return 2; //LEFT
-    } else if (rotation >= -135 && rotation < -45) {
+    }
+    else if (rotation >= -135 && rotation < -45) {
         return 3; //BACKWARD
-    } else {
+    }
+    else {
         return 4; //RIGHT
     }
 }
 
-void spawnEnimies(vector<Enemies>* enemies_list) {
+void spawnEnimies(vector<Enemies> &enemies_list) {
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 2; i++) {
         int CoordX, CoordY;
-        CoordX = rand() % ((int) Maps[0].getWidth()) + 0;
+        CoordX = rand() % ((int)Maps[0].getWidth()) + 0;
         CoordY = rand() % ((int)Maps[0].getHeight()) + 0;
 
         cout << "Enemy: " << i + 1 << " (" << CoordX << "," << CoordY << ") " << endl;
@@ -93,11 +98,11 @@ void spawnEnimies(vector<Enemies>* enemies_list) {
         speed.x = rand() % (2) + 1;
         speed.y = rand() % (2) + 1;
 
-        Enemies enemy(45.0f,45.0f,CoordX, CoordY, speed);
+        Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f));
+        //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
 
-        enemies_list->push_back(enemy);
+        enemies_list.push_back(enemy);
     }
-
 }
 
 int main()
@@ -112,7 +117,7 @@ int main()
     MapHandler::loadTexture();
 
     sf::Texture Map;
-    if (!Map.loadFromFile("TestMap3.png")) {
+    if (!Map.loadFromFile("TestMap2.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
@@ -125,7 +130,7 @@ int main()
     if (!Bow.loadFromFile("bow2.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
-    
+
     /* SETTING GAME*/
     sf::RectangleShape MapBackground(sf::Vector2f(1280.0f, 1280.0f));
     MapBackground.setTexture(&Map);
@@ -138,6 +143,15 @@ int main()
     sf::RectangleShape Test(sf::Vector2f(160.0f, 128.0f));
     Test.setOrigin(Test.getSize() / 2.0f);
     Test.setTexture(&Bow);
+
+    if (!mobTexture.loadFromFile("MOB_1.png")) {
+        cout << "ERROR MOB TEXTURE" << endl;
+    }
+   
+    /*sf::RectangleShape TestTexture(sf::Vector2f(51.0f, 90.0f));
+    TestTexture.setTexture(&mobTexture);
+    TestTexture.setTextureRect(sf::IntRect(0, 0, 51, 90));
+    TestTexture.setPosition(sf::Vector2f(700.0f, 500.0f));*/
 
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(VIEW_WIDTH, VIEW_HEIGHT));
     float deltaTime = 0.0f;
@@ -155,8 +169,9 @@ int main()
     vector<Arrow> arrows;
 
     /* ENEMEIS */
-    vector<Enemies> enemies_list;
-    spawnEnimies(&enemies_list);
+    spawnEnimies(enemies_list);
+
+    //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -173,11 +188,11 @@ int main()
         playerCenter = player.getBody().getPosition();
         mousePosWindow = windowRender.mapPixelToCoords(sf::Mouse::getPosition(windowRender));
 
-        int RotationType = 0; //Default ไม่ต้องหมุนตัวละครตามทิศทียิง
+        int RotationType = 0; //Default
 
         windowRender.setView(view);
 
-       // windowRender.draw(player.getHitbox());
+        // windowRender.draw(player.getHitbox());
 
         Test.setPosition(player.getBody().getPosition());
 
@@ -188,26 +203,30 @@ int main()
 
         windowRender.draw(MapBackground);
         windowRender.draw(player.getBody());
+       // windowRender.draw(TestTexture);
+      //  windowRender.draw(enemy.getBody());
+
+        //enemy.Test(deltaTime);
 
         while (windowRender.pollEvent(event)) {
 
             switch (event.type) {
-                case sf::Event::Closed: {
-                    windowRender.close();
-                    break;
-                }
-                case sf::Event::Resized: {
-                    printf("New windoe width: %i New window height %i\n", event.size.width, event.size.height);
+            case sf::Event::Closed: {
+                windowRender.close();
+                break;
+            }
+            case sf::Event::Resized: {
+                printf("New windoe width: %i New window height %i\n", event.size.width, event.size.height);
 
-                    ResizeView(windowRender, view);
-                    break;
+                ResizeView(windowRender, view);
+                break;
+            }
+            case sf::Event::TextEntered: {
+                if (event.text.unicode < 128) {
+                    // printf("%c", event.text.unicode);
                 }
-                case sf::Event::TextEntered: {
-                    if (event.text.unicode < 128) {
-                       // printf("%c", event.text.unicode);
-                    }
-                    break;
-                }
+                break;
+            }
             }
 
             if (event.type == sf::Event::MouseButtonPressed)
@@ -219,16 +238,19 @@ int main()
 
                     bool isAllowShoot = true;
 
-                    if ((walkType == WalkTypes::BACKWARD || walkType == WalkTypes::BACKWARD_LEFT || walkType == WalkTypes::BACKWARD_RIGHT)  && (RotationType != 3 && RotationType != 0)) {
-                        isAllowShoot = false;
-                    } else if ((walkType == WalkTypes::RIGHT) && (RotationType != 4 && RotationType != 0)) {
-                        isAllowShoot = false;
-                    } else if (walkType == WalkTypes::LEFT && (RotationType != 2 && RotationType != 0)) {
-                        isAllowShoot = false;
-                    } else if ((walkType == WalkTypes::FORWARD || walkType == WalkTypes::FORWARD_LEFT || walkType == WalkTypes::FORWARD_RIGHT) && (RotationType != 1 && RotationType != 0)) {
+                    if ((walkType == WalkTypes::BACKWARD || walkType == WalkTypes::BACKWARD_LEFT || walkType == WalkTypes::BACKWARD_RIGHT) && (RotationType != 3 && RotationType != 0)) {
                         isAllowShoot = false;
                     }
-                   
+                    else if ((walkType == WalkTypes::RIGHT) && (RotationType != 4 && RotationType != 0)) {
+                        isAllowShoot = false;
+                    }
+                    else if (walkType == WalkTypes::LEFT && (RotationType != 2 && RotationType != 0)) {
+                        isAllowShoot = false;
+                    }
+                    else if ((walkType == WalkTypes::FORWARD || walkType == WalkTypes::FORWARD_LEFT || walkType == WalkTypes::FORWARD_RIGHT) && (RotationType != 1 && RotationType != 0)) {
+                        isAllowShoot = false;
+                    }
+
                     if (isAllowShoot) {
                         aimDir = mousePosWindow - playerCenter;
                         aimDirNorm = aimDir / (float)sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2));
@@ -273,8 +295,10 @@ int main()
 
         for (int i = 0; i < enemies_list.size(); i++) {
             windowRender.draw(enemies_list[i].getBody());
+            windowRender.draw(enemies_list[i].getHitbox());
+           // enemies_list[i].Test(deltaTime);
 
-            enemies_list[i].Update(player.getBody().getPosition());
+            enemies_list[i].Update(player.getBody().getPosition(), deltaTime);
         }
 
         windowRender.draw(MapBackgroundAssest);

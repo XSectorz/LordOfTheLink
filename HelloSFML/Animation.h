@@ -1,13 +1,14 @@
+#ifndef Animation_H
+#define Animation_H
 #include <SFML/Graphics.hpp>
 
 class Animation
 {
 public:
-	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime);
-	~Animation();
+	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, int uvRectWidth, int uvRectHeight);
 
 	void ChangeImageCount(int imageCount);
-	void Update(int row, float deltaTime);
+	void Update(int row, float deltaTime, int uvRectLeft, int uvRectTop);
 
 public:
 	sf::IntRect uvRect;
@@ -19,4 +20,7 @@ private:
 	float totalTime;
 	float switchTime;
 };
+#endif
+
+
 

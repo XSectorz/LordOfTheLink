@@ -5,11 +5,17 @@
 
 using namespace std;
 
-Enemies::Enemies(float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed) {
+Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed) :
+	animation(texture, imageCount, switchTime, 48, 90)
+{
 	this->body.setSize(sf::Vector2f(size_x, size_y));
+	hitbox.setSize(sf::Vector2f(32.0f, 54.0f));
 	body.setPosition(pos_x, pos_y);
+	hitbox.setPosition(pos_x, pos_y);
 	body.setOrigin(this->body.getSize()/2.0f);
-	body.setFillColor(sf::Color::Red);
+	body.setTexture(texture);
+	body.setTextureRect(sf::IntRect(0, 0, 48, 90));
+	hitbox.setOrigin(hitbox.getSize() / 2.0f);
 	this->speed = speed;
 	this->prevPos = sf::Vector2f(pos_x, pos_y);
 }
@@ -23,7 +29,35 @@ sf::Vector2f Enemies::getArrayPosition() {
 	return ArrayPosition;
 }
 
-void Enemies::Update(sf::Vector2f playerPosition) {
+void Enemies::Test(float deltaTime_Enemy) {
+	animation.Update(3, deltaTime_Enemy, 50, 100);
+	body.setTextureRect(animation.uvRect);
+}
+
+int getRowType(WalkTypes walkType) {
+	if (walkType == WalkTypes::LEFT) {
+		return 2;
+	} else if (walkType == WalkTypes::BACKWARD || walkType == WalkTypes::BACKWARD_LEFT || walkType == WalkTypes::BACKWARD_RIGHT) {
+		return 2;
+	} else if (walkType == WalkTypes::RIGHT) {
+		return 2;
+	} else if (walkType == WalkTypes::FORWARD || walkType == WalkTypes::FORWARD_LEFT || walkType == WalkTypes::FORWARD_RIGHT) {
+		return 0;
+	}
+}
+
+bool Enemies::isIntersectOther() {
+	for (int i = 0; i < enemies_list.size(); i++) {
+		if (body.getPosition().x != enemies_list[i].getBody().getPosition().x || body.getPosition().y != enemies_list[i].getBody().getPosition().y) {
+			if (enemies_list[i].GetCollinder().CheckCollision(GetCollinder())) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 
 	sf::Vector2f dir;
 	sf::Vector2f EnemyPosition = body.getPosition();
@@ -38,13 +72,14 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 
 	EnemyPosition.x += dir.x * this->speed.x;
 	EnemyPosition.y += dir.y * this->speed.y;
+	
+	animation.Update(0, deltaTime_Enemy, 50, 100);
+	body.setTextureRect(animation.uvRect);
+	WalkTypes walk = WalkTypes::LEFT;
 
 	if (EnemyPosition.x == this->prevPos.x && EnemyPosition.y == this->prevPos.y) {
 		//cout << "NOT MOVE" << endl;
 	} else {
-
-		WalkTypes walk = WalkTypes::LEFT;
-
 		int temp_EnemyX = round(EnemyPosition.x);
 		int temp_EnemyY = round(EnemyPosition.y);
 		int temp_prevPosEnemyX = round(this->prevPos.x);
@@ -158,10 +193,7 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 			if (BLOCK_STATS == 1) {
 				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
 
-				//windowRender.draw(Barrier2.getBody());
-
 				if (Barrier2.GetCollinder().CheckCollision(GetCollinder())) { //Intersect Barrier
-					//cout << "Im Stuck! and ";
 
 					/* INTELLIGENT MOVEMENT */
 					int BLOCK_STATS_2 = 0;
@@ -169,7 +201,10 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 
 					WalkTypes walkT = WalkTypes::LEFT;
 
-					if (x <= 0 || x >= Map.getVect()[0].size()) {
+					if (x < 0 || x >= Map.getVect()[0].size()) {
+						return;
+					}
+					if (y < 0 || y >= Map.getVect().size()) {
 						return;
 					}
 
@@ -185,67 +220,59 @@ void Enemies::Update(sf::Vector2f playerPosition) {
 						BLOCK_STATS_2 = Map.getVect()[y][x-1];
 						walkT = WalkTypes::LEFT;
 					}
-
-					//cout << "My position: " << x << "," << y << " IS BLOCK: " << BLOCK_STATS_2 << endl;
 					sf::Vector2f Intelligent_Movement(temp_prevPosEnemyX, temp_prevPosEnemyY);
 
 					if (BLOCK_STATS_2 == 0 && BLOCK_STATS_CURRENT_POSITION == 0) { // Check left And Right
 
-						//cout << "-----> CAN MOVE : x = " << Intelligent_Movement.x << " ";
-						//cout << "-----> CAN MOVE : ";
 						if (walkT == WalkTypes::RIGHT) {
 							Intelligent_Movement.x = Intelligent_Movement.x + 2;
-							//cout << "RIGHT" << endl;
 						} else if (walkT == WalkTypes::LEFT) {
 							Intelligent_Movement.x = Intelligent_Movement.x - 2;
-							//cout << "LEFT" << endl;
 						}
-						//cout << "| x = " << Intelligent_Movement.x << " " << endl;;
 
 						body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+						hitbox.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
 						this->prevPos = Intelligent_Movement;
 						return;
 					} else {
-						//cout << "-----> CANT MOVE LEFT & RIGHT IM TRYING TO MOVE UP & DOWN" << endl;
 						if (EnemyPosition.y < player.getCurrentPosition().y) {
-							//cout << " Player are down! ";
 							BLOCK_STATS_2 = Map.getVect()[y+1][x];
 							walkT = WalkTypes::BACKWARD;
 
 						} else if (EnemyPosition.y > player.getCurrentPosition().y) {
-							//cout << " Player are up " << endl;
 							BLOCK_STATS_2 = Map.getVect()[y-1][x];
 							walkT = WalkTypes::FORWARD;
 						}
 
 						if (BLOCK_STATS_2 == 0 && BLOCK_STATS_CURRENT_POSITION == 0) { // Check lup & Down
-							//cout << "------> I CAN MOVE! ";
 							if (walkT == WalkTypes::BACKWARD) {
 								Intelligent_Movement.y = Intelligent_Movement.y + 2;
-								//cout << "DOWN" << endl;
 							}
 							else if (walkT == WalkTypes::FORWARD) {
 								Intelligent_Movement.y = Intelligent_Movement.y - 2;
-								//cout << "UP" << endl;
 							}
 
 							body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+							hitbox.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
 							this->prevPos = Intelligent_Movement;
 							return;
 						}
-						//cout << "-----> I CANT DO ANYTHING BRUH"  << endl;
+
 						return;
 					}
 				}
 			}
 		}
-	}
+ 	}
+
 	this->prevPos = EnemyPosition;
+
 	if (GetCollinder().CheckCollision(player.GetCollinder())) {
 		//cout << "Attack. " << endl;
 		return;
 	}
 
 	body.setPosition(sf::Vector2f(EnemyPosition.x, EnemyPosition.y));
+	hitbox.setPosition(sf::Vector2f(EnemyPosition.x, EnemyPosition.y));
 
 }

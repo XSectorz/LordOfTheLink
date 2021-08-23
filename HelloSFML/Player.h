@@ -1,4 +1,5 @@
 #pragma once
+
 #include <SFML/Graphics.hpp>
 #include "Animation.h"
 #include "Collider.h"
@@ -26,9 +27,9 @@ public:
 private:
 	sf::RectangleShape body;
 	sf::RectangleShape hitbox;
-	Animation animation;
 	unsigned int row;
 	float speed;
 	sf::Vector2f prevPos;
+	Animation animation;
 };
 

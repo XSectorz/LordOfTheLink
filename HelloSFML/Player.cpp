@@ -7,7 +7,7 @@
 using namespace std;
 
 Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float speed) :
-	animation(texture,imageCount,switchTime)
+	animation(texture,imageCount,switchTime,60,65)
 {
 	this->speed = speed;
 	this->prevPos = sf::Vector2f(0, 0);
@@ -260,7 +260,7 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 			break;
 	}
 
-	animation.Update(row, deltaTime);
+	animation.Update(row, deltaTime,60,65);
 	body.setTextureRect(animation.uvRect);
 	body.move(movement);
 	hitbox.move(movement);

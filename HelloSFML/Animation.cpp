@@ -1,27 +1,25 @@
 #include "Animation.h"
 
-Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime) {
+Animation::Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,int uvRectWidth,int uvRectHeight) {
 
 	this->imageCount = imageCount;
 	this->switchTime = switchTime;
 	totalTime = 0.0f;
 	currentImage.x = 0;
 
-	uvRect.width = 60;
-	uvRect.height = 66;
+	uvRect.width = uvRectWidth;
+	uvRect.height = uvRectHeight;
 }
 
 void Animation::ChangeImageCount(int imageCount) {
 	this->imageCount.x = imageCount;
 }
 
-Animation::~Animation() {
-
-}
-
-void Animation::Update(int row, float deltaTime) {
+void Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
 	currentImage.y = row;
 	totalTime += deltaTime;
+
+	//printf("TOTAL: %f/%f\n", deltaTime, switchTime);
 
 	if (totalTime >= switchTime) {
 		totalTime -= switchTime;
@@ -37,6 +35,7 @@ void Animation::Update(int row, float deltaTime) {
 		currentImage.x = 0;
 	}
 
-	uvRect.left = currentImage.x * 60;
-	uvRect.top = currentImage.y * 65;
+	uvRect.left = currentImage.x * uvRectLeft;
+	uvRect.top = currentImage.y * uvRectTop;
+	//printf("CUT AT: %d|%d\n", uvRect.left, uvRect.top);
 }
