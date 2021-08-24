@@ -262,7 +262,8 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 
 	animation.Update(row, deltaTime,60,65);
 	body.setTextureRect(animation.uvRect);
-	body.move(movement);
 	hitbox.move(movement);
+	body.move(movement);
+	
 	return WalkType;
 }

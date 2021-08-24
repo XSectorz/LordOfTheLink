@@ -5,8 +5,8 @@
 
 using namespace std;
 
-Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed) :
-	animation(texture, imageCount, switchTime, 48, 90)
+Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP) :
+	animation(texture, imageCount, switchTime, 50, 100)
 {
 	this->body.setSize(sf::Vector2f(size_x, size_y));
 	hitbox.setSize(sf::Vector2f(32.0f, 54.0f));
@@ -14,10 +14,12 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 	hitbox.setPosition(pos_x, pos_y);
 	body.setOrigin(this->body.getSize()/2.0f);
 	body.setTexture(texture);
-	body.setTextureRect(sf::IntRect(0, 0, 48, 90));
+	body.setTextureRect(sf::IntRect(0, 0, 50, 100));
 	hitbox.setOrigin(hitbox.getSize() / 2.0f);
 	this->speed = speed;
 	this->prevPos = sf::Vector2f(pos_x, pos_y);
+	this->CurrentHP = CurrentHP;
+	this->MaxHP = MaxHP;
 }
 
 sf::Vector2f Enemies::getArrayPosition() {
@@ -30,7 +32,7 @@ sf::Vector2f Enemies::getArrayPosition() {
 }
 
 void Enemies::Test(float deltaTime_Enemy) {
-	animation.Update(3, deltaTime_Enemy, 50, 100);
+	animation.Update(2, deltaTime_Enemy, 50, 100);
 	body.setTextureRect(animation.uvRect);
 }
 
@@ -44,17 +46,6 @@ int getRowType(WalkTypes walkType) {
 	} else if (walkType == WalkTypes::FORWARD || walkType == WalkTypes::FORWARD_LEFT || walkType == WalkTypes::FORWARD_RIGHT) {
 		return 0;
 	}
-}
-
-bool Enemies::isIntersectOther() {
-	for (int i = 0; i < enemies_list.size(); i++) {
-		if (body.getPosition().x != enemies_list[i].getBody().getPosition().x || body.getPosition().y != enemies_list[i].getBody().getPosition().y) {
-			if (enemies_list[i].GetCollinder().CheckCollision(GetCollinder())) {
-				return true;
-			}
-		}
-	}
-	return false;
 }
 
 void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
@@ -73,8 +64,19 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 	EnemyPosition.x += dir.x * this->speed.x;
 	EnemyPosition.y += dir.y * this->speed.y;
 	
-	animation.Update(0, deltaTime_Enemy, 50, 100);
 	body.setTextureRect(animation.uvRect);
+	if (hitCount > 0 && !isDead) {
+		animation.Update(1, deltaTime_Enemy, 50, 100);
+		hitCount--;
+	} else if(!isDead) {
+		animation.Update(0, deltaTime_Enemy, 50, 100);
+	} else {
+		if (animation.Update(2, deltaTime_Enemy*1.5f, 50, 100)) {
+			cout << "REMOVE" << endl;
+			setIsCanremove(true);
+		}
+		return;
+	}
 	WalkTypes walk = WalkTypes::LEFT;
 
 	if (EnemyPosition.x == this->prevPos.x && EnemyPosition.y == this->prevPos.y) {
@@ -229,9 +231,10 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 						} else if (walkT == WalkTypes::LEFT) {
 							Intelligent_Movement.x = Intelligent_Movement.x - 2;
 						}
-
-						body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+						
 						hitbox.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+						body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+						
 						this->prevPos = Intelligent_Movement;
 						return;
 					} else {
@@ -251,9 +254,10 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 							else if (walkT == WalkTypes::FORWARD) {
 								Intelligent_Movement.y = Intelligent_Movement.y - 2;
 							}
-
-							body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+							
 							hitbox.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+							body.setPosition(sf::Vector2f(Intelligent_Movement.x, Intelligent_Movement.y));
+				
 							this->prevPos = Intelligent_Movement;
 							return;
 						}

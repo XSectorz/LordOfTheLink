@@ -15,7 +15,7 @@ void Animation::ChangeImageCount(int imageCount) {
 	this->imageCount.x = imageCount;
 }
 
-void Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
+bool Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
 	currentImage.y = row;
 	totalTime += deltaTime;
 
@@ -26,6 +26,7 @@ void Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
 		currentImage.x++;
 		if (currentImage.x >= imageCount.x) {
 			currentImage.x = 0;
+			return true;
 		}
 	}
 
@@ -37,5 +38,6 @@ void Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
 
 	uvRect.left = currentImage.x * uvRectLeft;
 	uvRect.top = currentImage.y * uvRectTop;
+	return false;
 	//printf("CUT AT: %d|%d\n", uvRect.left, uvRect.top);
 }

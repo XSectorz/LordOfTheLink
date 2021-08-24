@@ -8,7 +8,7 @@ public:
 	Animation(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, int uvRectWidth, int uvRectHeight);
 
 	void ChangeImageCount(int imageCount);
-	void Update(int row, float deltaTime, int uvRectLeft, int uvRectTop);
+	bool Update(int row, float deltaTime, int uvRectLeft, int uvRectTop);
 
 public:
 	sf::IntRect uvRect;

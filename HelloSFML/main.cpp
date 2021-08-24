@@ -98,7 +98,7 @@ void spawnEnimies(vector<Enemies> &enemies_list) {
         speed.x = rand() % (2) + 1;
         speed.y = rand() % (2) + 1;
 
-        Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f));
+        Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f),100,100); //Enemy type 1
         //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
 
         enemies_list.push_back(enemy);
@@ -148,9 +148,9 @@ int main()
         cout << "ERROR MOB TEXTURE" << endl;
     }
    
-    /*sf::RectangleShape TestTexture(sf::Vector2f(51.0f, 90.0f));
+   /* sf::RectangleShape TestTexture(sf::Vector2f(51.0f, 90.0f));
     TestTexture.setTexture(&mobTexture);
-    TestTexture.setTextureRect(sf::IntRect(0, 0, 51, 90));
+    TestTexture.setTextureRect(sf::IntRect(0, 0, 48, 90));
     TestTexture.setPosition(sf::Vector2f(700.0f, 500.0f));*/
 
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(VIEW_WIDTH, VIEW_HEIGHT));
@@ -172,6 +172,7 @@ int main()
     spawnEnimies(enemies_list);
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
+    Enemies enemy(&mobTexture, sf::Vector2u(7, 4), 0.3f, 51.0f, 90.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100); //Enemy type 1
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -202,11 +203,27 @@ int main()
         WalkTypes walkType = player.Update(deltaTime, RotationType);
 
         windowRender.draw(MapBackground);
-        windowRender.draw(player.getBody());
-       // windowRender.draw(TestTexture);
-      //  windowRender.draw(enemy.getBody());
 
-        //enemy.Test(deltaTime);
+
+        for (int i = 0; i < enemies_list.size(); i++) {
+
+            if (enemies_list[i].ISCanRemove()) {
+                enemies_list.erase(enemies_list.begin() + i);
+                continue;
+            }
+
+            windowRender.draw(enemies_list[i].getBody());
+          //  windowRender.draw(enemies_list[i].getHitbox());
+            // enemies_list[i].Test(deltaTime);
+
+            enemies_list[i].Update(player.getBody().getPosition(), deltaTime);
+        }
+
+        windowRender.draw(player.getBody());
+       // windowRender.draw(player.getHitbox());
+       // windowRender.draw(TestTexture);
+       // windowRender.draw(enemy.getBody());
+       // enemy.Test(deltaTime);
 
         while (windowRender.pollEvent(event)) {
 
@@ -279,9 +296,21 @@ int main()
 
             for (int j = 0; j < enemies_list.size(); j++) {
                 if (enemies_list[j].GetCollinder().CheckCollision(arrows[i].GetCollinder())) {
-                    enemies_list.erase(enemies_list.begin() + j);
-                    arrows.erase(arrows.begin() + i);
+
+                    if (enemies_list[j].ISDead()) {
+                        continue;
+                    }
+
+                    enemies_list[j].setCurrentHP(enemies_list[j].getCurrentHP() - 10);
+                    enemies_list[j].setHitCount(8);
+                    cout << "ENEMY HP: " << enemies_list[j].getCurrentHP() << endl;
+
+                    if (enemies_list[j].getCurrentHP() <= 0) {
+                        enemies_list[j].setIsDead(true);
+                    }
+
                     isHitEnemy = true;
+                    arrows.erase(arrows.begin() + i);
                     break;
                 }
             }
@@ -292,14 +321,6 @@ int main()
         }
 
         windowRender.draw(Test);
-
-        for (int i = 0; i < enemies_list.size(); i++) {
-            windowRender.draw(enemies_list[i].getBody());
-            windowRender.draw(enemies_list[i].getHitbox());
-           // enemies_list[i].Test(deltaTime);
-
-            enemies_list[i].Update(player.getBody().getPosition(), deltaTime);
-        }
 
         windowRender.draw(MapBackgroundAssest);
         windowRender.display();
