@@ -17,10 +17,15 @@ public:
 	float getCurrentHP() { return this->CurrentHP; }
 	void setIsDead(bool isDead) { this->isDead = isDead; }
 	void setIsCanremove(bool isCanRemove) { this->isCanRemove = isCanRemove; }
+	void setIsAttack(bool isAttack) { this->isAttack = isAttack; }
 	bool ISDead() { return this->isDead; }
 	bool ISCanRemove() { return this->isCanRemove; }
+	bool ISAttack() { return this->isAttack; }
 	void setHitCount(int hitCount) { this->hitCount = hitCount; }
-
+	int getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPosition);
+	int getAnimationHit(int currentAnimation);
+	int getCurrentDeathAnimation() { return this->currentDeathAnimation;  }
+	void setCurrentDeathAnimation(int currentDeathAnimation) { this->currentDeathAnimation = currentDeathAnimation; }
 	sf::RectangleShape getBody() { return body; }
 	sf::RectangleShape getHitbox() { return hitbox; }
 	sf::Vector2f getArrayPosition();
@@ -31,7 +36,9 @@ private:
 	float CurrentHP;
 	bool isDead = false;
 	bool isCanRemove = false;
+	bool isAttack = false;
 	int hitCount = 0;
+	int currentDeathAnimation = 8;
 	sf::RectangleShape body;
 	sf::RectangleShape hitbox;
 	sf::Vector2f speed;

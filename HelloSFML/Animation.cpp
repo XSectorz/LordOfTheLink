@@ -26,6 +26,7 @@ bool Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
 		currentImage.x++;
 		if (currentImage.x >= imageCount.x) {
 			currentImage.x = 0;
+			
 			return true;
 		}
 	}

@@ -41,6 +41,14 @@ public:
 
 };
 
+struct less_than_key
+{
+    inline bool operator() (Enemies struct1, Enemies struct2)
+    {
+        return (struct1.getBody().getPosition().y < struct2.getBody().getPosition().y);
+    }
+};
+
 void ResizeView(const sf::RenderWindow& window, sf::View& view) {
     float aspectRation = float(window.getSize().x) / float(window.getSize().y);
     view.setSize(VIEW_HEIGHT * aspectRation, VIEW_HEIGHT);
@@ -87,7 +95,7 @@ int getRotationType(float rotation) {
 
 void spawnEnimies(vector<Enemies> &enemies_list) {
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
         int CoordX, CoordY;
         CoordX = rand() % ((int)Maps[0].getWidth()) + 0;
         CoordY = rand() % ((int)Maps[0].getHeight()) + 0;
@@ -98,7 +106,8 @@ void spawnEnimies(vector<Enemies> &enemies_list) {
         speed.x = rand() % (2) + 1;
         speed.y = rand() % (2) + 1;
 
-        Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f),100,100); //Enemy type 1
+        Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f), 100, 100); //Enemy type 1
+        //Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f),100,100); //Enemy type 1
         //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
 
         enemies_list.push_back(enemy);
@@ -144,7 +153,7 @@ int main()
     Test.setOrigin(Test.getSize() / 2.0f);
     Test.setTexture(&Bow);
 
-    if (!mobTexture.loadFromFile("MOB_1.png")) {
+    if (!mobTexture.loadFromFile("[NW]_MOB_2.png")) {
         cout << "ERROR MOB TEXTURE" << endl;
     }
    
@@ -172,7 +181,7 @@ int main()
     spawnEnimies(enemies_list);
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
-    Enemies enemy(&mobTexture, sf::Vector2u(7, 4), 0.3f, 51.0f, 90.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100); //Enemy type 1
+    Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100); //Enemy type 1
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -212,18 +221,42 @@ int main()
                 continue;
             }
 
+            if (enemies_list[i].getBody().getPosition().y >= player.getBody().getPosition().y) {
+                continue;
+            }
+
             windowRender.draw(enemies_list[i].getBody());
           //  windowRender.draw(enemies_list[i].getHitbox());
             // enemies_list[i].Test(deltaTime);
 
-            enemies_list[i].Update(player.getBody().getPosition(), deltaTime);
+            enemies_list[i].Update(player.getBody().getPosition(), deltaTime*2);
         }
 
+        windowRender.draw(Test);
         windowRender.draw(player.getBody());
+
+        for (int i = 0; i < enemies_list.size(); i++) {
+
+            if (enemies_list[i].ISCanRemove()) {
+                enemies_list.erase(enemies_list.begin() + i);
+                continue;
+            }
+
+            if (enemies_list[i].getBody().getPosition().y < player.getBody().getPosition().y) {
+                continue;
+            }
+
+            windowRender.draw(enemies_list[i].getBody());
+            //  windowRender.draw(enemies_list[i].getHitbox());
+              // enemies_list[i].Test(deltaTime);
+
+            enemies_list[i].Update(player.getBody().getPosition(), deltaTime * 2);
+        }
+
        // windowRender.draw(player.getHitbox());
        // windowRender.draw(TestTexture);
        // windowRender.draw(enemy.getBody());
-       // enemy.Test(deltaTime);
+       // enemy.Test(deltaTime*2);
 
         while (windowRender.pollEvent(event)) {
 
@@ -320,10 +353,11 @@ int main()
             }
         }
 
-        windowRender.draw(Test);
-
         windowRender.draw(MapBackgroundAssest);
         windowRender.display();
+
+        /* SORT ENEMY LOCATION */
+        std::sort(enemies_list.begin(), enemies_list.end(), less_than_key());
     }
 
     return 0;
