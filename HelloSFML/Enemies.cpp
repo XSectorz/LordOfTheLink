@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP) :
+Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP, EnemyType enemyType) :
 	animation(texture, imageCount, switchTime, 80, 100)
 {
 	this->body.setSize(sf::Vector2f(size_x, size_y));
@@ -20,6 +20,7 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 	this->prevPos = sf::Vector2f(pos_x, pos_y);
 	this->CurrentHP = CurrentHP;
 	this->MaxHP = MaxHP;
+	this->enemyType = enemyType;
 }
 
 sf::Vector2f Enemies::getArrayPosition() {
@@ -35,35 +36,61 @@ int Enemies::getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPos
 
 	if (EnemyPosition.x < playerPosition.x) { // ENEMY -> PLAYER
 		if (ISAttack()) {
-			animation.ChangeImageCount(4);
+			if (enemyType == EnemyType::NORMAL) {
+				animation.ChangeImageCount(4);
+			} else if (enemyType == EnemyType::RANGED) {
+				animation.ChangeImageCount(6);
+			}
 			return 6;
 		}
 
-		animation.ChangeImageCount(3);
+		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::RANGED) {
+			animation.ChangeImageCount(5);
+		}
 		return 2;
 	} else if (EnemyPosition.x >= playerPosition.x) { // PLAYER <- ENEMY
 		if (ISAttack()) {
-			animation.ChangeImageCount(4);
+			if (enemyType == EnemyType::NORMAL) {
+				animation.ChangeImageCount(4);
+			} else if (enemyType == EnemyType::RANGED) {
+				animation.ChangeImageCount(6);
+			}
 			return 4;
 		}
 
-		animation.ChangeImageCount(3);
+		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::RANGED) {
+			animation.ChangeImageCount(5);
+		}
 		return 0;
 	}
 }
 
 int Enemies::getAnimationHit(int currentAnimation) {
 	if (currentAnimation == 0) {
-		animation.ChangeImageCount(3);
+		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::RANGED) {
+			animation.ChangeImageCount(5);
+		}
 		return 1;
 	} else if (currentAnimation == 2) {
-		animation.ChangeImageCount(3);
+		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(5);
+		}
 		return 3;
 	} else if (currentAnimation == 4) {
-		animation.ChangeImageCount(4);
+		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(6);
+		}
 		return 5;
 	} else if (currentAnimation == 6) {
-		animation.ChangeImageCount(4);
+		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(6);
+		}
 		return 7;
 	}
 }
@@ -72,7 +99,7 @@ int Enemies::getAnimationHit(int currentAnimation) {
 void Enemies::Test(float deltaTime_Enemy) {
 	sf::Vector2f EnemyPosition = body.getPosition();
 	sf::Vector2f playerPosition = player.getBody().getPosition();
-	animation.Update(8, deltaTime_Enemy, 80, 100);
+	animation.Update(7, deltaTime_Enemy, 80, 100);
 	//animation.Update(getAnimationType(EnemyPosition, playerPosition), deltaTime_Enemy, 80, 100);
 
 	body.setTextureRect(animation.uvRect);
@@ -135,6 +162,19 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 			return;
 		}
 	}
+
+	double distance = sqrt(pow((playerPosition.x - EnemyPosition.x), 2) + pow((playerPosition.y - EnemyPosition.y), 2));
+
+	if (enemyType == EnemyType::RANGED) {
+		if (distance <= 200) {
+			if (ISAttack()) { //Attack cant move
+				return;
+			}
+			setIsAttack(true);
+			return;
+		}
+	}
+
 	WalkTypes walk = WalkTypes::LEFT;
 
 	if (EnemyPosition.x == this->prevPos.x && EnemyPosition.y == this->prevPos.y) {

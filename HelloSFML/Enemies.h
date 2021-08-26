@@ -4,12 +4,15 @@
 #include "Collider.h"
 #include "Animation.h"
 
+
+enum class EnemyType { NORMAL, RANGED };
+
 class Enemies
 {
 
 public:
 
-	Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP);
+	Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,EnemyType enemyType);
 
 	void Update(sf::Vector2f playerPosition, float deltaTime_Enemy);
 	void Test(float deltaTime_Enemy);
@@ -39,6 +42,7 @@ private:
 	bool isAttack = false;
 	int hitCount = 0;
 	int currentDeathAnimation = 8;
+	EnemyType enemyType;
 	sf::RectangleShape body;
 	sf::RectangleShape hitbox;
 	sf::Vector2f speed;

@@ -1,20 +1,22 @@
 ﻿  main.cpp
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(106,32): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
-          with
-          [
-              T=float
-          ]
 C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(107,32): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
           with
           [
               T=float
           ]
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(109,86): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(109,78): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(122,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(196,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(217,27): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(238,27): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(319,27): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(330,31): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(108,32): warning C4244: '=': conversion from 'int' to 'T', possible loss of data
+          with
+          [
+              T=float
+          ]
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(111,90): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(111,82): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(114,92): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(114,84): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(130,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(212,24): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(233,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(254,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(336,27): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(347,31): warning C4018: '<': signed/unsigned mismatch
   HelloSFML.vcxproj -> C:\Users\Computer\source\repos\HelloSFML\Debug\HelloSFML.exe

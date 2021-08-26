@@ -20,6 +20,7 @@ static const float VIEW_WIDTH = 1024.0f;
 static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","9,7","16,6","15,8","15,9","18,10","4,12" ,"4,11","2,13","7,13","12,17","12,16","15,16" };
 
 static sf::Texture mobTexture;
+static sf::Texture mobTexture_2;
 
 class Arrow {
 
@@ -34,7 +35,7 @@ public:
     {
         this->arrow.setSize(sf::Vector2f(40.0f, 40.0f));
         this->arrow.setOrigin(this->arrow.getSize() / 2.0f);
-        this->arrow.setFillColor(sf::Color::Red);
+      //  this->arrow.setFillColor(sf::Color::Red);
     };
 
     Collider GetCollinder() { return Collider(arrow); }
@@ -95,7 +96,7 @@ int getRotationType(float rotation) {
 
 void spawnEnimies(vector<Enemies> &enemies_list) {
 
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 2; i++) {
         int CoordX, CoordY;
         CoordX = rand() % ((int)Maps[0].getWidth()) + 0;
         CoordY = rand() % ((int)Maps[0].getHeight()) + 0;
@@ -106,11 +107,18 @@ void spawnEnimies(vector<Enemies> &enemies_list) {
         speed.x = rand() % (2) + 1;
         speed.y = rand() % (2) + 1;
 
-        Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f), 100, 100); //Enemy type 1
+        if (i % 2 == 0) {
+            Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f), 100, 100, EnemyType::NORMAL); //Enemy type 1
+            enemies_list.push_back(enemy);
+        } else {
+            Enemies enemy(&mobTexture_2, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(5.0f, 5.0f), 1000, 1000, EnemyType::RANGED); //Enemy type 2
+            enemies_list.push_back(enemy);
+        }
+       
         //Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f),100,100); //Enemy type 1
         //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
 
-        enemies_list.push_back(enemy);
+       
     }
 }
 
@@ -140,6 +148,11 @@ int main()
         printf("LOAD ERROR TEXTURE\n");
     }
 
+    sf::Texture ArrowT;
+    if (!ArrowT.loadFromFile("BIW.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
     /* SETTING GAME*/
     sf::RectangleShape MapBackground(sf::Vector2f(1280.0f, 1280.0f));
     MapBackground.setTexture(&Map);
@@ -154,6 +167,9 @@ int main()
     Test.setTexture(&Bow);
 
     if (!mobTexture.loadFromFile("[NW]_MOB_2.png")) {
+        cout << "ERROR MOB TEXTURE" << endl;
+    }
+    if (!mobTexture_2.loadFromFile("[NW]_MOB_3.png")) {
         cout << "ERROR MOB TEXTURE" << endl;
     }
    
@@ -181,7 +197,7 @@ int main()
     spawnEnimies(enemies_list);
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
-    Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100); //Enemy type 1
+    Enemies enemy(&mobTexture, sf::Vector2u(5, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100,EnemyType::RANGED); //Enemy type 1
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -255,8 +271,8 @@ int main()
 
        // windowRender.draw(player.getHitbox());
        // windowRender.draw(TestTexture);
-       // windowRender.draw(enemy.getBody());
-       // enemy.Test(deltaTime*2);
+        //windowRender.draw(enemy.getBody());
+        //enemy.Test(deltaTime*2);
 
         while (windowRender.pollEvent(event)) {
 
@@ -308,6 +324,7 @@ int main()
                         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                             arrow1.arrow.setPosition(playerCenter);
                             arrow1.currVelocity = aimDirNorm * arrow1.maxSpeed;
+                            arrow1.arrow.setTexture(&ArrowT);
                             arrows.push_back(Arrow(arrow1));
                         }
                     }
