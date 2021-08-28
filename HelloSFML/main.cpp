@@ -12,6 +12,7 @@
 #include <vector>
 #include "Enemies.h"
 #include <time.h> 
+#include "Effect.h"
 
 using namespace std;
 
@@ -21,6 +22,7 @@ static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","
 
 static sf::Texture mobTexture;
 static sf::Texture mobTexture_2;
+static vector<Effect> effect_list;
 
 class Arrow {
 
@@ -96,7 +98,7 @@ int getRotationType(float rotation) {
 
 void spawnEnimies(vector<Enemies> &enemies_list) {
 
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 20; i++) {
         int CoordX, CoordY;
         CoordX = rand() % ((int)Maps[0].getWidth()) + 0;
         CoordY = rand() % ((int)Maps[0].getHeight()) + 0;
