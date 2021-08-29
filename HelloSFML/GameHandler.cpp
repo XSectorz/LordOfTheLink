@@ -6,3 +6,5 @@ sf::Texture playerTexture;
 Player player(&playerTexture, sf::Vector2u(3, 8), 0.3f, 200.0f);
 vector<Enemies> enemies_list;
 vector<Effect> effect_list;
+sf::Texture particles;
+sf::Texture hp_bar;

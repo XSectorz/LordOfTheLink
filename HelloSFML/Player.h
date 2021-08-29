@@ -19,6 +19,8 @@ public:
 	sf::Vector2f getPrevposition();
 	sf::RectangleShape getBody() { return body; }
 	sf::RectangleShape getHitbox() { return hitbox; }
+	float getHelath() { return this->health;  }
+	void setHealth(float health) { this->health = health;  }
 
 	sf::Vector2f getCurrentPosition() { return body.getPosition(); }
 
@@ -29,6 +31,7 @@ private:
 	sf::RectangleShape hitbox;
 	unsigned int row;
 	float speed;
+	float health = 100;
 	sf::Vector2f prevPos;
 	Animation animation;
 };

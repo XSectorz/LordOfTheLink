@@ -5,7 +5,7 @@
 
 using namespace std;
 
-Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP, EnemyType enemyType) :
+Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,float damage, EnemyType enemyType) :
 	animation(texture, imageCount, switchTime, 80, 100)
 {
 	this->body.setSize(sf::Vector2f(size_x, size_y));
@@ -21,6 +21,7 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 	this->CurrentHP = CurrentHP;
 	this->MaxHP = MaxHP;
 	this->enemyType = enemyType;
+	this->damage = damage;
 }
 
 sf::Vector2f Enemies::getArrayPosition() {
@@ -124,10 +125,11 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 	body.setTextureRect(animation.uvRect);
 
 	if (ISAttack()) {
+		bool isAttack_Success = false;
 		if (hitCount > 0 && !isDead) {
 			if (animation.Update(getAnimationHit(getAnimationType(EnemyPosition, playerPosition)), deltaTime_Enemy, 80, 100)) {
 				setIsAttack(false);
-				cout << "ATTACK SUCCESSFUL" << endl;
+				isAttack_Success = true;
 			}
 			hitCount--;
 		} else if (isDead) {
@@ -138,11 +140,21 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 				}
 				currentDeathAnimation = 9;
 			}
+			return;
 		} else {
 			if (animation.Update(getAnimationType(EnemyPosition, playerPosition), deltaTime_Enemy, 80, 100)) {
 				setIsAttack(false);
-				cout << "ATTACK SUCCESSFUL" << endl;
+				isAttack_Success = true;
 			}
+		}
+		if (isAttack_Success) {
+			if (enemyType == EnemyType::RANGED) {
+				Effect effect(&particles, sf::Vector2u(3, 10), 0.3f);
+				effect_list.push_back(effect);
+			}
+			cout << "ATTACK SUCCESSFUL" << endl;
+			player.setHealth(player.getHelath() - damage);
+			cout << "HEALTH: " << player.getHelath() << endl;
 		}
 		return;
 	} else {

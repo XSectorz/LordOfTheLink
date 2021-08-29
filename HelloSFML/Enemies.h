@@ -12,7 +12,7 @@ class Enemies
 
 public:
 
-	Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,EnemyType enemyType);
+	Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,float damage,EnemyType enemyType);
 
 	void Update(sf::Vector2f playerPosition, float deltaTime_Enemy);
 	void Test(float deltaTime_Enemy);
@@ -42,6 +42,7 @@ private:
 	bool isAttack = false;
 	int hitCount = 0;
 	int currentDeathAnimation = 8;
+	float damage = 0;
 	EnemyType enemyType;
 	sf::RectangleShape body;
 	sf::RectangleShape hitbox;

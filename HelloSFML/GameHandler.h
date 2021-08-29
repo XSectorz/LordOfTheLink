@@ -9,6 +9,8 @@
 extern vector<TilemapHandler> Maps;
 extern sf::RenderWindow windowRender;
 extern sf::Texture playerTexture;
+extern sf::Texture particles;
+extern sf::Texture hp_bar;
 extern Player player;
 extern vector<Enemies> enemies_list;
 extern vector<Effect> effect_list;
@@ -19,7 +21,7 @@ class MapHandler
 public:
 
 	static void loadTexture() {
-		playerTexture.loadFromFile("character_betaT.png");
+		playerTexture.loadFromFile("assets/texture/player.png");
 	}
 
 };

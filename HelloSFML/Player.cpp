@@ -45,8 +45,12 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 	sf::Vector2f vectArr = getArrayPosition();
 
 	bool isWalking = false;
-
 	WalkTypes WalkType = WalkTypes::IDLE;
+
+	/*if (health <= 0) {
+		cout << "DEAD" << endl;
+		return WalkType;
+	}*/
 
 	//row is Index of animation
 

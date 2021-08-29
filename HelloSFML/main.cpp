@@ -13,6 +13,7 @@
 #include "Enemies.h"
 #include <time.h> 
 #include "Effect.h"
+#include "DynamicBar.h"
 
 using namespace std;
 
@@ -22,7 +23,6 @@ static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","
 
 static sf::Texture mobTexture;
 static sf::Texture mobTexture_2;
-static vector<Effect> effect_list;
 
 class Arrow {
 
@@ -98,22 +98,22 @@ int getRotationType(float rotation) {
 
 void spawnEnimies(vector<Enemies> &enemies_list) {
 
-    for (int i = 0; i < 20; i++) {
-        int CoordX, CoordY;
-        CoordX = rand() % ((int)Maps[0].getWidth()) + 0;
-        CoordY = rand() % ((int)Maps[0].getHeight()) + 0;
+    for (int i = 0; i < 4; i++) {
+        float CoordX, CoordY;
+        CoordX = (float) (rand() % ((int)Maps[0].getWidth()) + 0);
+        CoordY = (float) (rand() % ((int)Maps[0].getHeight()) + 0);
 
         cout << "Enemy: " << i + 1 << " (" << CoordX << "," << CoordY << ") " << endl;
 
         sf::Vector2f speed;
-        speed.x = rand() % (2) + 1;
-        speed.y = rand() % (2) + 1;
+        speed.x = (float) (rand() % (2) + 1);
+        speed.y = (float) (rand() % (2) + 1);
 
         if (i % 2 == 0) {
-            Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f), 100, 100, EnemyType::NORMAL); //Enemy type 1
+            Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f), 100, 100, 10, EnemyType::NORMAL); //Enemy type 1
             enemies_list.push_back(enemy);
         } else {
-            Enemies enemy(&mobTexture_2, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(5.0f, 5.0f), 1000, 1000, EnemyType::RANGED); //Enemy type 2
+            Enemies enemy(&mobTexture_2, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(5.0f, 5.0f), 1000, 1000, 1, EnemyType::RANGED); //Enemy type 2
             enemies_list.push_back(enemy);
         }
        
@@ -129,30 +129,33 @@ int main()
     windowRender.setFramerateLimit(60);
 
     /* initialize random seed: */
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
 
     /* LOADING TEXTURE */
 
     MapHandler::loadTexture();
 
     sf::Texture Map;
-    if (!Map.loadFromFile("TestMap2.png")) {
+    if (!Map.loadFromFile("assets/map/Map.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
     sf::Texture Map2;
-    if (!Map2.loadFromFile("TestMap2_1.png")) {
+    if (!Map2.loadFromFile("assets/map/Map_background.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
     sf::Texture Bow;
-    if (!Bow.loadFromFile("bow2.png")) {
+    if (!Bow.loadFromFile("assets/texture/BOW.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
-    sf::Texture ArrowT;
-    if (!ArrowT.loadFromFile("BIW.png")) {
+    if (!hp_bar.loadFromFile("assets/test/Health_BAR_01.png")) {
         printf("LOAD ERROR TEXTURE\n");
+    }
+
+    if (particles.loadFromFile("assets/texture/PARTICLES.png")) {
+        printf("LOAD ERROR PARTICLES\n");
     }
 
     /* SETTING GAME*/
@@ -168,17 +171,12 @@ int main()
     Test.setOrigin(Test.getSize() / 2.0f);
     Test.setTexture(&Bow);
 
-    if (!mobTexture.loadFromFile("[NW]_MOB_2.png")) {
+    if (!mobTexture.loadFromFile("assets/texture/[NW]_MOB_2.png")) {
         cout << "ERROR MOB TEXTURE" << endl;
     }
-    if (!mobTexture_2.loadFromFile("[NW]_MOB_3.png")) {
+    if (!mobTexture_2.loadFromFile("assets/texture/[NW]_MOB_3.png")) {
         cout << "ERROR MOB TEXTURE" << endl;
     }
-   
-   /* sf::RectangleShape TestTexture(sf::Vector2f(51.0f, 90.0f));
-    TestTexture.setTexture(&mobTexture);
-    TestTexture.setTextureRect(sf::IntRect(0, 0, 48, 90));
-    TestTexture.setPosition(sf::Vector2f(700.0f, 500.0f));*/
 
     sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(VIEW_WIDTH, VIEW_HEIGHT));
     float deltaTime = 0.0f;
@@ -199,7 +197,10 @@ int main()
     spawnEnimies(enemies_list);
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
-    Enemies enemy(&mobTexture, sf::Vector2u(5, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100,EnemyType::RANGED); //Enemy type 1
+    Enemies enemy(&mobTexture, sf::Vector2u(5, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100, 5,EnemyType::RANGED); //Enemy type 1
+
+    /* DYNAMIC BAR */
+    DynamicBar HP_BAR(&hp_bar, sf::Vector2f(230.0f,50.0f),230.0f,50.0f);
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -211,7 +212,7 @@ int main()
 
         float dx = mousePosWindow.x - player.getBody().getPosition().x;
         float dy = mousePosWindow.y - player.getBody().getPosition().y;
-        float rotation = (atan2(dy, dx)) * 180 / M_PI;
+        float rotation = (float) (atan2(dy, dx) * 180.0 / M_PI);
 
         playerCenter = player.getBody().getPosition();
         mousePosWindow = windowRender.mapPixelToCoords(sf::Mouse::getPosition(windowRender));
@@ -232,7 +233,7 @@ int main()
         windowRender.draw(MapBackground);
 
 
-        for (int i = 0; i < enemies_list.size(); i++) {
+        for (int i = 0; i < (int) enemies_list.size(); i++) {
 
             if (enemies_list[i].ISCanRemove()) {
                 enemies_list.erase(enemies_list.begin() + i);
@@ -253,7 +254,17 @@ int main()
         windowRender.draw(Test);
         windowRender.draw(player.getBody());
 
-        for (int i = 0; i < enemies_list.size(); i++) {
+        for (int i = 0; i < (int) effect_list.size(); i++) {
+            effect_list[i].update(deltaTime);
+            if (effect_list[i].ISCanRemove()) {
+                effect_list.erase(effect_list.begin() + i);
+                continue;
+            }
+            windowRender.draw(effect_list[i].getBody());
+        }
+
+
+        for (int i = 0; i < (int) enemies_list.size(); i++) {
 
             if (enemies_list[i].ISCanRemove()) {
                 enemies_list.erase(enemies_list.begin() + i);
@@ -270,7 +281,8 @@ int main()
 
             enemies_list[i].Update(player.getBody().getPosition(), deltaTime * 2);
         }
-
+        HP_BAR.Update();
+        windowRender.draw(HP_BAR.getBody());
        // windowRender.draw(player.getHitbox());
        // windowRender.draw(TestTexture);
         //windowRender.draw(enemy.getBody());
@@ -326,7 +338,6 @@ int main()
                         if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                             arrow1.arrow.setPosition(playerCenter);
                             arrow1.currVelocity = aimDirNorm * arrow1.maxSpeed;
-                            arrow1.arrow.setTexture(&ArrowT);
                             arrows.push_back(Arrow(arrow1));
                         }
                     }
@@ -335,7 +346,7 @@ int main()
         }
 
         /* MOVING ARROW */
-        for (int i = 0; i < arrows.size(); i++) {
+        for (int i = 0; i < (int) arrows.size(); i++) {
             arrows[i].arrow.move(arrows[i].currVelocity);
 
             bool isHitEnemy = false;
@@ -346,7 +357,7 @@ int main()
                 continue;
             }
 
-            for (int j = 0; j < enemies_list.size(); j++) {
+            for (int j = 0; j < (int) enemies_list.size(); j++) {
                 if (enemies_list[j].GetCollinder().CheckCollision(arrows[i].GetCollinder())) {
 
                     if (enemies_list[j].ISDead()) {
