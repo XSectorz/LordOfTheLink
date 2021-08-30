@@ -1,0 +1,4 @@
+﻿  main.cpp
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(134,23): warning C4018: '<': signed/unsigned mismatch
+C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(326,27): warning C4018: '<': signed/unsigned mismatch
+  HelloSFML.vcxproj -> C:\Users\Computer\source\repos\HelloSFML\Debug\HelloSFML.exe
