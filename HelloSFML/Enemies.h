@@ -29,6 +29,7 @@ public:
 	int getAnimationHit(int currentAnimation);
 	int getCurrentDeathAnimation() { return this->currentDeathAnimation;  }
 	int getScore() { return this->score; }
+	void deathEvent();
 	void setCurrentDeathAnimation(int currentDeathAnimation) { this->currentDeathAnimation = currentDeathAnimation; }
 	sf::RectangleShape getBody() { return body; }
 	sf::RectangleShape getHitbox() { return hitbox; }

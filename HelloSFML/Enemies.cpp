@@ -1,5 +1,6 @@
 #include "Enemies.h"
 #include "GameHandler.h"
+#include "WaveHandler.h"
 #include <math.h>
 #include <iostream>
 
@@ -9,7 +10,7 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 	animation(texture, imageCount, switchTime, 80, 100)
 {
 	this->body.setSize(sf::Vector2f(size_x, size_y));
-	hitbox.setSize(sf::Vector2f(32.0f, 54.0f));
+	hitbox.setSize(sf::Vector2f(48.0f, 64.0f));
 	body.setPosition(pos_x, pos_y);
 	hitbox.setPosition(pos_x, pos_y);
 	body.setOrigin(this->body.getSize()/2.0f);
@@ -25,11 +26,25 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 	this->score = score;
 }
 
+void Enemies::deathEvent() {
+	
+	cout << "DEAD ! CURRENT: " << enemies_list.size() << endl;
+
+	if (enemies_list.size() == 1) { //DEATH LAST GO TO NEXT ROUND
+
+		WaveController.AddWave();
+
+		int cWave = WaveController.getCurrentWave();
+
+		WaveController.NextRoundUpdate(cWave);
+	}
+}
+
 sf::Vector2f Enemies::getArrayPosition() {
 	sf::Vector2f ArrayPosition;
 
-	ArrayPosition.x = ((this->body.getPosition().x + (this->body.getSize().x/2.0f)) / 64) - 1;
-	ArrayPosition.y = ((this->body.getPosition().y + (this->body.getSize().y/2.0f)) / 64) - 1;
+	ArrayPosition.x = ((this->body.getPosition().x + (this->body.getSize().x/2.0f)) / 48) - 1;
+	ArrayPosition.y = ((this->body.getPosition().y + (this->body.getSize().y/2.0f)) / 48) - 1;
 
 	return ArrayPosition;
 }
@@ -138,6 +153,7 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 				if (currentDeathAnimation == 9) {
 					//cout << "REMOVE" << endl;
 					setIsCanremove(true);
+					deathEvent();
 				}
 				currentDeathAnimation = 9;
 			}
@@ -169,6 +185,7 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 				if (currentDeathAnimation == 9) {
 					//cout << "REMOVE" << endl;
 					setIsCanremove(true);
+					deathEvent();
 				}
 				currentDeathAnimation = 9;
 			}
@@ -304,7 +321,7 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 			int BLOCK_STATS = Map.getVect()[coord.y][coord.x];
 
 			if (BLOCK_STATS == 1) {
-				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
+				Platform Barrier2(nullptr, sf::Vector2f(48.0f, 48.0f), sf::Vector2f((0.0f) + (48.0f * coord.x), (0.0f) + (48.0f * coord.y)));
 
 				if (Barrier2.GetCollinder().CheckCollision(GetCollinder())) { //Intersect Barrier
 

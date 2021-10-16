@@ -10,9 +10,9 @@ TilemapHandler::TilemapHandler(int mapID,float height,float width,vector<string>
 	this->height = height;
 	this->width = width;
 
-	for (int i = 0; i < height / 64; i++) { //i = y เพราะเป็นเเนวลงมา j = x เพราะเป็น array ที่ไปทางขวา * กันลืม
+	for (int i = 0; i < height / 48; i++) { //i = y เพราะเป็นเเนวลงมา j = x เพราะเป็น array ที่ไปทางขวา * กันลืม
 		vector<int> temp_vect;
-		for (int j = 0; j < width / 64; j++) {
+		for (int j = 0; j < width / 48; j++) {
 			temp_vect.push_back(0);
 		}
 		this->vect.push_back(temp_vect);

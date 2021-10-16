@@ -45,6 +45,9 @@
     <ClCompile Include="DynamicBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="WaveHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h">
@@ -72,6 +75,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DynamicBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WaveHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

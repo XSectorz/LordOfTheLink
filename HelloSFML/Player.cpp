@@ -26,8 +26,8 @@ Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, 
 sf::Vector2f Player::getArrayPosition() {
 	sf::Vector2f ArrayPosition;
 	
-	ArrayPosition.x = ((this->body.getPosition().x+28) / 64) -1;
-	ArrayPosition.y = ((this->body.getPosition().y+32) / 64) - 1;
+	ArrayPosition.x = ((this->body.getPosition().x+28) / 48) -1;
+	ArrayPosition.y = ((this->body.getPosition().y+32) / 48) - 1;
 
 	return ArrayPosition;
 }
@@ -181,7 +181,7 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 			//cout << coord.x << "," << coord.y << " " << " -> " << BLOCK_STATS;
 
 			if (BLOCK_STATS == 1) {
-				Platform Barrier2(nullptr, sf::Vector2f(64.0f, 64.0f), sf::Vector2f((0.0f) + (64.0f * coord.x), (0.0f) + (64.0f * coord.y)));
+				Platform Barrier2(nullptr, sf::Vector2f(48.0f, 48.0f), sf::Vector2f((0.0f) + (48.0f * coord.x), (0.0f) + (48.0f * coord.y)));
 
 				Barrier2.Draw(windowRender);
 

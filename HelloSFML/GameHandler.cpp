@@ -8,3 +8,6 @@ vector<Enemies> enemies_list;
 vector<Effect> effect_list;
 sf::Texture particles;
 sf::Texture hp_bar;
+sf::Texture mobTexture;
+sf::Texture mobTexture_2;
+WaveHandler WaveController;

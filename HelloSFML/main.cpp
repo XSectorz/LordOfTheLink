@@ -19,10 +19,14 @@ using namespace std;
 
 static const float VIEW_HEIGHT = 925.0f;
 static const float VIEW_WIDTH = 1024.0f;
-static const vector<string> MAP_0_BARRIER = { "2,3","2,2","10,2","10,3","10,5","9,7","16,6","15,8","15,9","18,10","4,12" ,"4,11","2,13","7,13","12,17","12,16","15,16" };
-
-static sf::Texture mobTexture;
-static sf::Texture mobTexture_2;
+static const vector<string> MAP_0_BARRIER = { "0,3","1,3","2,3","3,3","4,3","5,3","6,3","7,3","8,3","9,3","10,3","11,3" ,"11,2","11,1","11,0","1,4","1,5","4,13","5,13","4,14","5,14",
+                                               "1,25","2,25","3,25","1,26","2,26","3,26","5,35","11,13","11,19","12,19","13,19","14,19","12,20","13,20","14,20","20,26","21,26","22,26",
+                                                "20,27", "21,27", "22,27", "23,33", "22,4", "23,4", "22,5", "23,5","26,0","26,1","26,2","26,3","26,4","27,4","27,5","27,6","28,6",
+                                                "29,6","30,6","30,5","30,4","31,4","32,4","33,4","34,4","35,4","36,4","37,4","38,4","38,5","38,6","38,7","38,8","38,9","39,9", "31,12",
+                                                "32,12","33,12","31,13","32,13","33,13","33,14","34,14","21,12","22,12","23,12","24,12","25,12","25,13","26,13",
+                                                "26,14","27,14","27,15","27,16","27,17","26,17","26,18","25,18","24,18","23,18","22,18","21,18","21,17","20,17",
+                                                "19,16","19,16","19,15","19,14","20,14","20,13","36,23","37,23","38,23","36,24","37,24","38,24","32,34",
+                                                "27,39","28,39"};
 
 class Arrow {
 
@@ -59,7 +63,7 @@ void ResizeView(const sf::RenderWindow& window, sf::View& view) {
 
 void loadMap() {
 
-    TilemapHandler MapTest(0, 1280.0f, 1280.0f, MAP_0_BARRIER);
+    TilemapHandler MapTest(0, 1920.0f, 1920.0f, MAP_0_BARRIER);
 
     Maps.push_back(MapTest);
 
@@ -69,8 +73,8 @@ void loadMap() {
 
         vector<vector<int>> vect = Map.getVect();
 
-        for (int i = 0; i < Map.getHeight() / 64; i++) {
-            for (int j = 0; j < Map.getWidth() / 64; j++) {
+        for (int i = 0; i < Map.getHeight() / 48; i++) {
+            for (int j = 0; j < Map.getWidth() / 48; j++) {
                 cout << vect[i][j] << " ";
             }
             cout << endl;
@@ -93,34 +97,6 @@ int getRotationType(float rotation) {
     }
     else {
         return 4; //RIGHT
-    }
-}
-
-void spawnEnimies(vector<Enemies> &enemies_list) {
-
-    for (int i = 0; i < 10; i++) {
-        float CoordX, CoordY;
-        CoordX = (float) (rand() % ((int)Maps[0].getWidth()) + 0);
-        CoordY = (float) (rand() % ((int)Maps[0].getHeight()) + 0);
-
-        cout << "Enemy: " << i + 1 << " (" << CoordX << "," << CoordY << ") " << endl;
-
-        sf::Vector2f speed;
-        speed.x = (float) (rand() % (2) + 1);
-        speed.y = (float) (rand() % (2) + 1);
-
-        if (i % 2 == 0) {
-            Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f), 50, 50, 10, 800, EnemyType::NORMAL); //Enemy type 1
-            enemies_list.push_back(enemy);
-        } else {
-            Enemies enemy(&mobTexture_2, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, CoordX, CoordY, sf::Vector2f(5.0f, 5.0f), 10, 10, 1, 10, EnemyType::RANGED); //Enemy type 2
-            enemies_list.push_back(enemy);
-        }
-       
-        //Enemies enemy(&mobTexture,sf::Vector2u(4,4),0.3f, 51.0f, 90.0f, CoordX, CoordY, sf::Vector2f(2.0f, 2.0f),100,100); //Enemy type 1
-        //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
-
-       
     }
 }
 
@@ -149,12 +125,12 @@ int main()
     MapHandler::loadTexture();
 
     sf::Texture Map;
-    if (!Map.loadFromFile("assets/map/Map.png")) {
+    if (!Map.loadFromFile("assets/map/Arena_Ground.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
     sf::Texture Map2;
-    if (!Map2.loadFromFile("assets/map/Map_background.png")) {
+    if (!Map2.loadFromFile("assets/map/Arena_assests.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
 
@@ -177,11 +153,11 @@ int main()
     }
 
     /* SETTING GAME*/
-    sf::RectangleShape MapBackground(sf::Vector2f(1280.0f, 1280.0f));
+    sf::RectangleShape MapBackground(sf::Vector2f(1920.0f, 1920.0f));
     MapBackground.setTexture(&Map);
     MapBackground.setPosition(sf::Vector2f(0.0f, 0.0f));
 
-    sf::RectangleShape MapBackgroundAssest(sf::Vector2f(1280.0f, 1280.0f));
+    sf::RectangleShape MapBackgroundAssest(sf::Vector2f(1920.0f, 1920.0f));
     MapBackgroundAssest.setTexture(&Map2);
     MapBackgroundAssest.setPosition(sf::Vector2f(0.0f, 0.0f));
 
@@ -216,7 +192,8 @@ int main()
     vector<Arrow> arrows;
 
     /* ENEMEIS */
-    spawnEnimies(enemies_list);
+    //spawnEnimies(enemies_list);
+    WaveController.NextRoundUpdate(1);
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
     Enemies enemy(&mobTexture, sf::Vector2u(5, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100, 5, 10,EnemyType::RANGED); //Enemy type 1
@@ -239,12 +216,52 @@ int main()
         score_text_list.push_back(text);
     }
 
+    float temp_position = 0.0f;
+    float temp_position_2 = 0.0f;
+    int isOutOfScreen_type = 0;
+
     while (windowRender.isOpen()) {
         sf::Event event;
 
         deltaTime = clock.restart().asSeconds();
 
-        view.setCenter(player.getCurrentPosition());
+
+        if ((player.getArrayPosition().x >= 28.5 && player.getArrayPosition().y >= 29.5) || (player.getArrayPosition().x <= 10.5 && player.getArrayPosition().y >= 29.5) || (player.getArrayPosition().x <= 10.5 && player.getArrayPosition().y <= 9.5) || (player.getArrayPosition().x >= 28.5 && player.getArrayPosition().y <= 9.5)) {
+            if (isOutOfScreen_type == 1) { //Left To Top Window
+                temp_position_2 = player.getCurrentPosition().y;
+            } else if (isOutOfScreen_type == 2) { //Right to top
+                temp_position_2 = temp_position;
+                temp_position = player.getCurrentPosition().x;
+            }
+            isOutOfScreen_type = 5;
+            view.setCenter(temp_position, temp_position_2);
+        } else if (player.getArrayPosition().x <= 10.5 || player.getArrayPosition().x >= 28.5) {
+            if (isOutOfScreen_type == 5) {
+                temp_position_2 = player.getCurrentPosition().y; //ออกจากด้านบนซ้ายเเละเดินไปทางด้านล่าง
+                view.setCenter(temp_position, temp_position_2);
+            } else {
+                if (isOutOfScreen_type != 1) { //Left Window
+                    temp_position = player.getCurrentPosition().x;
+                    isOutOfScreen_type = 1;
+                }
+                view.setCenter(temp_position, player.getCurrentPosition().y);
+            }
+        } else if (player.getArrayPosition().y <= 9.5 || player.getArrayPosition().y >= 29.5) {
+            if (isOutOfScreen_type == 5) {
+                temp_position = player.getCurrentPosition().x; //ออกจากด้านบนซ้ายเเละเดินไปทางซ้าย
+                view.setCenter(temp_position, temp_position_2);
+            } else {
+                if (isOutOfScreen_type != 2) { //Up Window
+                    temp_position = player.getCurrentPosition().y;
+                    isOutOfScreen_type = 2;
+                }
+                view.setCenter(player.getCurrentPosition().x, temp_position);
+            }
+        } else {
+            isOutOfScreen_type = 0;
+            view.setCenter(player.getCurrentPosition());
+        }
+        
         windowRender.clear(sf::Color::Yellow);
 
         float dx = mousePosWindow.x - player.getBody().getPosition().x;
@@ -318,18 +335,7 @@ int main()
 
             enemies_list[i].Update(player.getBody().getPosition(), deltaTime * 2);
         }
-
-        Test2.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1050, 0)));
-        windowRender.draw(Test2);
        
-        updateScoreToText(score_text_list);
-        for (int i = 0; i < score_text_list.size(); i++) {
-            score_text_list[i].setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1110 + i*19, 118)));
-            windowRender.draw(score_text_list[i]);
-        }
-        
-        HP_BAR.Update();
-        windowRender.draw(HP_BAR.getBody());
        // windowRender.draw(player.getHitbox());
        // windowRender.draw(TestTexture);
         //windowRender.draw(enemy.getBody());
@@ -395,7 +401,7 @@ int main()
         /* MOVING ARROW */
         for (int i = 0; i < (int) arrows.size(); i++) {
             arrows[i].arrow.move(arrows[i].currVelocity);
-
+            
             bool isHitEnemy = false;
 
             if (arrows[i].arrow.getPosition().x < 0 || arrows[i].arrow.getPosition().y < 0
@@ -432,6 +438,17 @@ int main()
         }
 
         windowRender.draw(MapBackgroundAssest);
+        Test2.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1050, 0)));
+        windowRender.draw(Test2);
+        updateScoreToText(score_text_list);
+        for (int i = 0; i < score_text_list.size(); i++) {
+            score_text_list[i].setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1110 + i * 19, 118)));
+            windowRender.draw(score_text_list[i]);
+        }
+
+        HP_BAR.Update();
+        windowRender.draw(HP_BAR.getBody());
+
         windowRender.display();
 
         /* SORT ENEMY LOCATION */
