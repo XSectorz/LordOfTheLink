@@ -48,6 +48,14 @@ public:
 
 };
 
+struct less_than_key_items
+{
+    inline bool operator() (Items struct1, Items struct2)
+    {
+        return (struct1.getBody().getPosition().y < struct2.getBody().getPosition().y);
+    }
+};
+
 struct less_than_key
 {
     inline bool operator() (Enemies struct1, Enemies struct2)
@@ -110,8 +118,52 @@ void updateScoreToText(vector<sf::Text> &text_list) {
     for (int i = 0; i < text_list.size(); i++) {
         text_list[i].setString(data[i]);
     }
+}
+
+sf::String IntToString(int num) {
+
+    char str[10];
+    sprintf_s(str, "%d", num);
+
+    sf::Text text;
+    text.setString(str);
+
+    return text.getString();
 
 }
+
+void spawnItems() {
+    
+    for (int i = 0; i < 5; i++) {
+        int Index = (int)(rand() % (6) + 0);
+        sf::Vector2f spawnPos[6] = { {830.5,166.5},{125.4,973.4},{953.3,1768.4},{1793.5,1448.3},{1624.4,458.3},{171.2,1615.3} };
+
+        int randItemType = (int)(rand() % (4) + 0);
+
+        if (randItemType == 0) {
+            Items items(&items_hp_potion, spawnPos[Index], 0);
+            items_list.push_back(items);
+            cout << "SPAWN POTION " << " TYPE: " << 0 << endl;
+
+        } else if (randItemType == 1) {
+            Items items(&items_strength_potion, spawnPos[Index], 1);
+            items_list.push_back(items);
+            cout << "SPAWN POTION " << " TYPE: " << 1 << endl;
+        } else if (randItemType == 2) {
+            Items items(&items_speed_potion, spawnPos[Index], 2);
+            items_list.push_back(items);
+            cout << "SPAWN POTION " << " TYPE: " << 2 << endl;
+        } else if (randItemType == 3) {
+            Items items(&items_nuke, spawnPos[Index], 3);
+            items_list.push_back(items);
+            cout << "SPAWN POTION " << " TYPE: " << 3 << endl;
+        }
+        
+    }
+
+}
+
+
 
 int main()
 {
@@ -144,6 +196,27 @@ int main()
         printf("LOAD ERROR TEXTURE\n");
     }
 
+    sf::Texture Test;
+    if (!Test.loadFromFile("assets/texture/ITEM_SELECT_UI.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
+    if (!items_hp_potion.loadFromFile("assets/texture/potionV2.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
+    if (!items_strength_potion.loadFromFile("assets/texture/potionV2_Strength.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
+    if (!items_speed_potion.loadFromFile("assets/texture/potionV2_Speed.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
+    if (!items_nuke.loadFromFile("assets/texture/potionV2_Nuke.png")) {
+        printf("LOAD ERROR TEXTURE\n");
+    }
+
     if (!hp_bar.loadFromFile("assets/test/Health_BAR_01.png")) {
         printf("LOAD ERROR TEXTURE\n");
     }
@@ -161,12 +234,20 @@ int main()
     MapBackgroundAssest.setTexture(&Map2);
     MapBackgroundAssest.setPosition(sf::Vector2f(0.0f, 0.0f));
 
-    sf::RectangleShape Test(sf::Vector2f(160.0f, 128.0f));
-    Test.setOrigin(Test.getSize() / 2.0f);
-    Test.setTexture(&Bow);
+    sf::RectangleShape SelectedUI(sf::Vector2f(192.0f, 192.0f));
+    SelectedUI.setTexture(&Test);
+    SelectedUI.setPosition(sf::Vector2f(0.0f, 0.0f));
 
-    sf::RectangleShape Test2(sf::Vector2f(200.0f, 150.0f));
-    Test2.setTexture(&Score);
+    sf::RectangleShape Weapon(sf::Vector2f(160.0f, 128.0f));
+    Weapon.setOrigin(Weapon.getSize() / 2.0f);
+    Weapon.setTexture(&Bow);
+
+    sf::RectangleShape Items(sf::Vector2f(64.0f, 128.0f));
+    Items.setOrigin(Items.getSize() / 2.0f);
+    Items.setTexture(&items_hp_potion);
+
+    sf::RectangleShape ScoreBoard(sf::Vector2f(200.0f, 150.0f));
+    ScoreBoard.setTexture(&Score);
     //Test2.setTextureRect(sf::IntRect(0, 0, 100, 70));
 
     if (!mobTexture.loadFromFile("assets/texture/[NW]_MOB_2.png")) {
@@ -216,14 +297,39 @@ int main()
         score_text_list.push_back(text);
     }
 
+    vector<sf::Text> text_list;
+    for (int i = 0; i < 3; i++) {
+        sf::Text text;
+        text.setCharacterSize(20);
+        text.setFillColor(sf::Color(124, 0, 6));
+        text.setFont(font);
+        text_list.push_back(text);
+    }
+
+    text_list[0].setString("WAVE : ");
+    text_list[1].setString(IntToString(WaveController.getCurrentWave()));
+
+
     float temp_position = 0.0f;
     float temp_position_2 = 0.0f;
     int isOutOfScreen_type = 0;
+
+    float cd_selectedItems = 0.0f;
+    sf::Clock elapsedCDTime;
+    sf::Clock elapsedCDTime_SelectedItem;
+    sf::Clock elapsedCDTime_StrengthTimer;
+    sf::Clock elapsedCDTime_SpeedTimer;
+
+    spawnItems();
 
     while (windowRender.isOpen()) {
         sf::Event event;
 
         deltaTime = clock.restart().asSeconds();
+        player.setCDShot(player.getCDShot() - elapsedCDTime.restart().asSeconds());
+        player.setStrengthTimer(player.getStrengthTimer() - elapsedCDTime_StrengthTimer.restart().asSeconds());
+        player.setSpeedTimer(player.getSpeedTimer() - elapsedCDTime_SpeedTimer.restart().asSeconds());
+        cd_selectedItems -= elapsedCDTime_SelectedItem.restart().asSeconds();
 
 
         if ((player.getArrayPosition().x >= 28.5 && player.getArrayPosition().y >= 29.5) || (player.getArrayPosition().x <= 10.5 && player.getArrayPosition().y >= 29.5) || (player.getArrayPosition().x <= 10.5 && player.getArrayPosition().y <= 9.5) || (player.getArrayPosition().x >= 28.5 && player.getArrayPosition().y <= 9.5)) {
@@ -277,15 +383,53 @@ int main()
 
         // windowRender.draw(player.getHitbox());
 
-        Test.setPosition(player.getBody().getPosition());
+        Weapon.setPosition(player.getBody().getPosition());
 
-        Test.setRotation(rotation + 180);
+        Weapon.setRotation(rotation + 180);
         RotationType = getRotationType(rotation);
 
         WalkTypes walkType = player.Update(deltaTime, RotationType);
 
+        if (cd_selectedItems <= 0) {
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+                player.previousSelectedItems();
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+                player.nextSelectedItems();
+            }
+            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::E)) {
+                if (player.getItems(player.getSelectedItems()) > 0) {
+                    player.removeItem(player.getSelectedItems());
+
+                    if (player.getSelectedItems() == 0) {
+                        player.addHealth(20);
+                    }
+                    else if (player.getSelectedItems() == 1) {
+                        player.setCDShot(0.0f);
+                        player.setStrengthTimer(10.0f);
+                    }
+                    else if (player.getSelectedItems() == 2) {
+                        player.setSpeedTimer(10.0f);
+                        player.setSpeed(400.0f);
+                    }
+                    else if (player.getSelectedItems() == 3) {
+                        for (int i = 0; i < (int)enemies_list.size(); i++) {
+                            enemies_list[i].setCurrentHP(enemies_list[i].getCurrentHP() / 2.0f);
+                            //cout << i << " " << enemies_list[i].getCurrentHP() << endl;
+                        }
+                    }
+                }
+            }
+
+            cd_selectedItems = 0.20f;
+        }
+
         windowRender.draw(MapBackground);
 
+
+        for (int i = 0; i < (int)items_list.size(); i++) {
+            windowRender.draw(items_list[i].getBody());
+        }
 
         for (int i = 0; i < (int) enemies_list.size(); i++) {
 
@@ -305,7 +449,8 @@ int main()
             enemies_list[i].Update(player.getBody().getPosition(), deltaTime*2);
         }
 
-        windowRender.draw(Test);
+        windowRender.draw(Weapon);
+       
         windowRender.draw(player.getBody());
 
         for (int i = 0; i < (int) effect_list.size(); i++) {
@@ -316,7 +461,6 @@ int main()
             }
             windowRender.draw(effect_list[i].getBody());
         }
-
 
         for (int i = 0; i < (int) enemies_list.size(); i++) {
 
@@ -343,27 +487,9 @@ int main()
 
         while (windowRender.pollEvent(event)) {
 
-            switch (event.type) {
-            case sf::Event::Closed: {
+            if (event.type == sf::Event::Closed) {
                 windowRender.close();
-                break;
-            }
-            case sf::Event::Resized: {
-                printf("New windoe width: %i New window height %i\n", event.size.width, event.size.height);
-
-                ResizeView(windowRender, view);
-                break;
-            }
-            case sf::Event::TextEntered: {
-                if (event.text.unicode < 128) {
-                    // printf("%c", event.text.unicode);
-                }
-                break;
-            }
-            }
-
-            if (event.type == sf::Event::MouseButtonPressed)
-            {
+            } else if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left)
                 {
 
@@ -384,7 +510,8 @@ int main()
                         isAllowShoot = false;
                     }
 
-                    if (isAllowShoot) {
+                    if (isAllowShoot && player.getCDShot() <= 0) {
+
                         aimDir = mousePosWindow - playerCenter;
                         aimDirNorm = aimDir / (float)sqrt(pow(aimDir.x, 2) + pow(aimDir.y, 2));
 
@@ -392,11 +519,22 @@ int main()
                             arrow1.arrow.setPosition(playerCenter);
                             arrow1.currVelocity = aimDirNorm * arrow1.maxSpeed;
                             arrows.push_back(Arrow(arrow1));
+
+                            if (player.getStrengthTimer() < 0) {
+                                player.setCDShot(0.25f);
+                            }
                         }
                     }
                 }
             }
+            break;
         }
+
+        if (player.getSpeedTimer() < 0) {
+            player.setSpeed(200.0f);
+        }
+
+        //cout << (elapsedCDTime.getElapsedTime() / cooldownTime) << endl;
 
         /* MOVING ARROW */
         for (int i = 0; i < (int) arrows.size(); i++) {
@@ -438,21 +576,52 @@ int main()
         }
 
         windowRender.draw(MapBackgroundAssest);
-        Test2.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1050, 0)));
-        windowRender.draw(Test2);
+        ScoreBoard.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1050, 0)));
+        windowRender.draw(ScoreBoard);
         updateScoreToText(score_text_list);
+       
+        text_list[1].setString(IntToString(WaveController.getCurrentWave()));
+        text_list[2].setString(IntToString(player.getItems(player.getSelectedItems())));
+
+        //text_list[2].setString(IntToString(50));
+        text_list[0].setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1150, 68)));
+        text_list[1].setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1235, 68)));
+        text_list[2].setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1165, 852)));
+        Items.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1110, 820)));
+
         for (int i = 0; i < score_text_list.size(); i++) {
             score_text_list[i].setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1110 + i * 19, 118)));
+            
             windowRender.draw(score_text_list[i]);
         }
+
+        windowRender.draw(text_list[0]);
+        windowRender.draw(text_list[1]);
 
         HP_BAR.Update();
         windowRender.draw(HP_BAR.getBody());
 
+        SelectedUI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1000, 730)));
+        windowRender.draw(SelectedUI);
+
+        if (player.getSelectedItems() == 0) {
+            Items.setTexture(&items_hp_potion);
+        } else if (player.getSelectedItems() == 1) {
+            Items.setTexture(&items_strength_potion);
+        } else if (player.getSelectedItems() == 2) {
+            Items.setTexture(&items_speed_potion);
+        } else if (player.getSelectedItems() == 3) {
+            Items.setTexture(&items_nuke);
+        }
+
+        windowRender.draw(Items);
+        windowRender.draw(text_list[2]);
+
         windowRender.display();
 
-        /* SORT ENEMY LOCATION */
+        /* SORT ENEMY / ITEMS LOCATION */
         std::sort(enemies_list.begin(), enemies_list.end(), less_than_key());
+        std::sort(items_list.begin(), items_list.end(), less_than_key_items());
     }
 
     return 0;

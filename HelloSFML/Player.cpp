@@ -1,5 +1,6 @@
 #include "Player.h"
 #include "TilemapHandler.h"
+#include "Items.h"
 #include <iostream>
 #include "GameHandler.h"
 #include <cmath>
@@ -21,6 +22,20 @@ Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, 
 	body.setOrigin(body.getSize() / 2.0f);
 	hitbox.setOrigin(hitbox.getSize() / 2.0f);
 	body.setTextureRect(sf::IntRect(0, 0, 60, 66));
+}
+
+void Player::nextSelectedItems() {
+	this->selectedItems += 1;
+	if (this->selectedItems > 3) {
+		this->selectedItems = 0;
+	}
+}
+
+void Player::previousSelectedItems() {
+	this->selectedItems -= 1;
+	if (this->selectedItems < 0) {
+		this->selectedItems = 3;
+	}
 }
 
 sf::Vector2f Player::getArrayPosition() {
@@ -51,6 +66,7 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 		cout << "DEAD" << endl;
 		return WalkType;
 	}*/
+
 
 	//row is Index of animation
 
@@ -266,6 +282,14 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 
 	animation.Update(row, deltaTime,60,65);
 	body.setTextureRect(animation.uvRect);
+
+	for (int i = 0; i < (int)items_list.size(); i++) {
+		if (GetCollinder().CheckCollision(items_list[i].GetCollinder())) {
+			addItem(items_list[i].GetItemType());
+			items_list.erase(items_list.begin() + i);
+		}
+	}
+
 	hitbox.move(movement);
 	body.move(movement);
 	

@@ -150,6 +150,7 @@
     <ClCompile Include="DynamicBar.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Enemies.cpp" />
+    <ClCompile Include="Items.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="GameHandler.cpp" />
     <ClCompile Include="Platform.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Enemies.h" />
     <ClInclude Include="GameHandler.h" />
+    <ClInclude Include="Items.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="TilemapHandler.h" />
