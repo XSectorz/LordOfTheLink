@@ -32,6 +32,40 @@ void spawnEnemies(vector<Enemies>& enemies_list, int mobsType) {
 	}
 }
 
+void spawnItems(int amount) {
+
+	for (int i = 0; i < amount; i++) {
+		int Index = (int)(rand() % (6) + 0);
+		sf::Vector2f spawnPos[6] = { {830.5,166.5},{125.4,973.4},{953.3,1768.4},{1793.5,1448.3},{1624.4,458.3},{171.2,1615.3} };
+
+		int randItemType = (int)(rand() % (4) + 0);
+
+		if (randItemType == 0) {
+			Items items(&items_hp_potion, spawnPos[Index], 0);
+			items_list.push_back(items);
+			cout << "SPAWN POTION " << " TYPE: " << 0 << endl;
+
+		}
+		else if (randItemType == 1) {
+			Items items(&items_strength_potion, spawnPos[Index], 1);
+			items_list.push_back(items);
+			cout << "SPAWN POTION " << " TYPE: " << 1 << endl;
+		}
+		else if (randItemType == 2) {
+			Items items(&items_speed_potion, spawnPos[Index], 2);
+			items_list.push_back(items);
+			cout << "SPAWN POTION " << " TYPE: " << 2 << endl;
+		}
+		else if (randItemType == 3) {
+			Items items(&items_nuke, spawnPos[Index], 3);
+			items_list.push_back(items);
+			cout << "SPAWN POTION " << " TYPE: " << 3 << endl;
+		}
+
+	}
+
+}
+
 void WaveHandler::NextRoundUpdate(int cWave) {
 	
 	int mobC = getMonsterCount();
@@ -48,5 +82,7 @@ void WaveHandler::NextRoundUpdate(int cWave) {
 			spawnEnemies(enemies_list, i);
 		}
 	}
+
+	spawnItems(1);
 
 }

@@ -24,6 +24,26 @@ Player::Player(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, 
 	body.setTextureRect(sf::IntRect(0, 0, 60, 66));
 }
 
+void Player::reStartPlayer() {
+	body.setPosition(700.0f, 480.0f);
+	hitbox.setPosition(700.0f, 480.0f);
+	this->speed = 200.0f;
+	this->health = 100.0f;
+	this->speed_timer = 0.0f;
+	this->strength_timer = 0.0f;
+	this->cd_shot = 0.25;
+	this->score = 0;
+	this->selectedItems = 0;
+	this->ItemCount[0] = 0;
+	this->ItemCount[1] = 0;
+	this->ItemCount[2] = 0;
+	this->ItemCount[3] = 0;
+
+	body.setTextureRect(sf::IntRect(0, 0, 60, 66));
+	row = 0;
+
+}
+
 void Player::nextSelectedItems() {
 	this->selectedItems += 1;
 	if (this->selectedItems > 3) {

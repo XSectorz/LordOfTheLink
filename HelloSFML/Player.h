@@ -43,6 +43,7 @@ public:
 	int getSelectedItems() { return this->selectedItems;  }
 	void nextSelectedItems();
 	void previousSelectedItems();
+	void reStartPlayer();
 
 	sf::Vector2f getCurrentPosition() { return body.getPosition(); }
 

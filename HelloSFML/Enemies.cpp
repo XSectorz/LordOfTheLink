@@ -31,12 +31,13 @@ void Enemies::deathEvent() {
 	cout << "DEAD ! CURRENT: " << enemies_list.size() << endl;
 
 	if (enemies_list.size() == 1) { //DEATH LAST GO TO NEXT ROUND
+		isNext = true;
+		cooldownNext = 4.0f;
 
 		WaveController.AddWave();
-
-		int cWave = WaveController.getCurrentWave();
-
-		WaveController.NextRoundUpdate(cWave);
+		if (WaveController.getCurrentWave() != 1) {
+			sound_nextR.play();
+		}
 	}
 }
 
@@ -172,6 +173,7 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 			//cout << "ATTACK SUCCESSFUL" << endl;
 			player.setHealth(player.getHealth() - damage);
 			//cout << "HEALTH: " << player.getHealth() << endl;
+			sound_hit_person.play();
 		}
 		return;
 	} else {

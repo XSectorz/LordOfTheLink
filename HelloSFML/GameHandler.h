@@ -1,5 +1,6 @@
 #include "TilemapHandler.h"
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include "Platform.h"
 #include "Player.h"
 #include "Enemies.h"
@@ -24,6 +25,19 @@ extern sf::Texture items_hp_potion;
 extern sf::Texture items_strength_potion;
 extern sf::Texture items_speed_potion;
 extern sf::Texture items_nuke;
+extern sf::Texture resumeMenu;
+extern sf::SoundBuffer buffer_hit_person;
+extern sf::Sound sound_hit_person;
+extern sf::SoundBuffer buffer_hit_enemies;
+extern sf::SoundBuffer buffer_xp_mc;
+extern sf::Sound sound_xp_mc;
+extern sf::Sound sound_hit_enemies;
+extern sf::SoundBuffer buffer_nextR;
+extern sf::Sound sound_nextR;
+extern sf::Texture restartMenu;
+extern sf::Texture quitMenu;
+extern float cooldownNext;
+extern bool isNext;
 
 class MapHandler
 {
