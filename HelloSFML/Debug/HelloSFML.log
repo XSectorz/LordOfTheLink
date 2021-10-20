@@ -1,9 +1,0 @@
-﻿  main.cpp
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(118,23): warning C4018: '<': signed/unsigned mismatch
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(139,127): warning C4305: 'argument': truncation from 'double' to 'T'
-          with
-          [
-              T=float
-          ]
-C:\Users\Computer\source\repos\HelloSFML\HelloSFML\main.cpp(592,27): warning C4018: '<': signed/unsigned mismatch
-  HelloSFML.vcxproj -> C:\Users\Computer\source\repos\HelloSFML\Debug\HelloSFML.exe
