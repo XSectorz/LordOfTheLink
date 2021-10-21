@@ -170,6 +170,10 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 			player.setHealth(player.getHealth() - damage);
 			//cout << "HEALTH: " << player.getHealth() << endl;
 			sound_hit_person.play();
+
+			if (player.getHealth() <= 0) {
+				player.setIsDead(true);
+			}
 		}
 		return;
 	} else {

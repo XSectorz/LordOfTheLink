@@ -1,4 +1,5 @@
 #define _USE_MATH_DEFINES
+#define _CRT_SECURE_NO_WARNINGS 1
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <iostream>
@@ -15,6 +16,7 @@
 #include <time.h> 
 #include "Effect.h"
 #include "DynamicBar.h"
+#include <fstream>
 
 using namespace std;
 
@@ -29,6 +31,14 @@ static const vector<string> MAP_0_BARRIER = { "0,3","1,3","2,3","3,3","4,3","5,3
                                                 "19,16","19,16","19,15","19,14","20,14","20,13","36,23","37,23","38,23","36,24","37,24","38,24","32,34",
                                                 "27,39","28,39"};
 sf::View view(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1280.0f, 925.0f));
+sf::View view_lobby(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1280.0, 925.0f));
+
+struct topPlayer {
+    string name;
+    int score;
+};
+
+topPlayer topPlayers[5];
 
 class Arrow {
 
@@ -51,6 +61,8 @@ public:
     Collider GetCollinder() { return Collider(arrow_obj); }
 
 };
+
+vector<Arrow> arrows;
 
 struct less_than_key
 {
@@ -117,6 +129,7 @@ void StartGame() {
     enemies_list.clear();
     items_list.clear();
     WaveController.setWave(0);
+    arrows.clear();
 }
 
 sf::String IntToString(int num) {
@@ -131,6 +144,129 @@ sf::String IntToString(int num) {
 
 }
 
+void loadData() {
+    fstream fileStream;
+
+    fileStream.open("data.txt", ios::in);
+    string line;
+    
+    int i = 0;
+
+    while (std::getline(fileStream, line)) {
+        topPlayers[i].name = line.substr(0, line.find(','));
+        topPlayers[i].score = stoi(line.substr(line.find(',') + 1, line.length() - 1));
+        cout << topPlayers[i].name << " " << topPlayers[i].score << endl;
+        i++;
+    }
+    cout << "--- END OF LOADING DATA ---" << endl;
+
+}
+
+bool checkDataFile() {
+
+    bool isNULL = false;
+    fstream fileStream;
+
+    fileStream.open("data.txt");
+    if (fileStream.fail()) {
+        fileStream.open("data.txt", std::ios::out);
+        for (int i = 0; i < 5; i++) {
+            fileStream << "NO_DATA," << -1 << "\n";
+            topPlayers[i].name = "NO_DATA";
+            topPlayers[i].score = -1;
+        }
+        isNULL = true;
+    } else {
+        for (int i = 0; i < 4; i++) {
+            for (int j = i + 1; j < 5; j++) {
+                if (topPlayers[i].score > topPlayers[j].score) {
+                    swap(topPlayers[i],topPlayers[j]);
+                }
+            }
+        }
+    }
+    fileStream.close();
+    return isNULL;
+}
+
+void saveScore(sf::String name,int score) {
+
+   checkDataFile();
+   /* fstream my_file;
+    string line;
+    my_file.open("data.txt", ios::in);
+    while (std::getline(my_file,line)) {
+        cout << line << endl;
+    }
+
+    my_file.close();*/
+
+   bool isCanSort = false;
+   bool isSame = false;
+    cout << "SORT DATA LIST" << endl;
+    topPlayer temp_topPlayers[6];
+    for (int i = 0; i < 5; i++) {
+        temp_topPlayers[i].name = topPlayers[i].name;
+        temp_topPlayers[i].score = topPlayers[i].score;
+
+        if (score >= topPlayers[i].score) {
+            isCanSort = true;
+        }
+
+        if (topPlayers[i].name == name) {
+            isSame = true;
+            if (score >= topPlayers[i].score) {
+                topPlayers[i].score = score;
+            }
+            cout << "SAME SET NEW SCORE" << endl;
+        }
+    }
+
+
+    if (isCanSort && !isSame) {
+        temp_topPlayers[5].name = name;
+        temp_topPlayers[5].score = score;
+
+        for (int i = 0; i < 5; i++) {
+            for (int j = i + 1; j < 6; j++) {
+                if (temp_topPlayers[i].score > temp_topPlayers[j].score) {
+                    swap(temp_topPlayers[i], temp_topPlayers[j]);
+                }
+            }
+        }
+        fstream my_file;
+        my_file.open("data.txt", ios::out);
+       // my_file << string(name.toAnsiString()) << " " << score;
+
+        cout << "SET DATA SUCCESS" << endl;
+
+        for (int i = 1; i < 6; i++) {
+            topPlayers[i-1].name = temp_topPlayers[i].name;
+            topPlayers[i-1].score = temp_topPlayers[i].score;
+            my_file << topPlayers[i - 1].name << "," << topPlayers[i - 1].score << "\n";
+        }
+        my_file.close();
+    } else if(isSame) {
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = i + 1; j < 5; j++) {
+                if (topPlayers[i].score > topPlayers[j].score) {
+                    swap(topPlayers[i], topPlayers[j]);
+                }
+            }
+        }
+        fstream my_file;
+        my_file.open("data.txt", ios::out);
+        for (int i = 0; i < 5; i++) {
+            my_file << topPlayers[i].name << "," << topPlayers[i].score << "\n";
+        }
+        my_file.close();
+
+        cout << "SET DATA SUCCESS CASE 2" << endl;
+
+    }
+}
+
 int main()
 {
     windowRender.setFramerateLimit(60);
@@ -143,104 +279,49 @@ int main()
     MapHandler::loadTexture();
 
     sf::Texture Map;
-    if (!Map.loadFromFile("assets/map/Arena_Ground.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
+    Map.loadFromFile("assets/map/Arena_Ground.png");
 
     sf::Texture Map2;
-    if (!Map2.loadFromFile("assets/map/Arena_assests.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
+    Map2.loadFromFile("assets/map/Arena_assests.png");
 
     sf::Texture Bow;
-    if (!Bow.loadFromFile("assets/texture/BOW.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
+    Bow.loadFromFile("assets/texture/BOW.png");
 
     sf::Texture Score;
-    if (!Score.loadFromFile("assets/test/Score_Counter.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
+    Score.loadFromFile("assets/test/Score_Counter.png");
 
     sf::Texture Test;
-    if (!Test.loadFromFile("assets/texture/ITEM_SELECT_UI.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
+    Test.loadFromFile("assets/texture/ITEM_SELECT_UI.png");
 
-    if (!items_hp_potion.loadFromFile("assets/texture/potionV2.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!items_strength_potion.loadFromFile("assets/texture/potionV2_Strength.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!items_speed_potion.loadFromFile("assets/texture/potionV2_Speed.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!restartMenu.loadFromFile("assets/texture/Restart_A.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!resumeMenu.loadFromFile("assets/texture/Resume_A.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!restartMenu.loadFromFile("assets/texture/Resume_A.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!HowButton.loadFromFile("assets/texture/how_button.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!ExitButton.loadFromFile("assets/texture/button_exit.png")) {
-        printf("LOAD ERROR TEXTURE\n");
-    }
-
-    if (!quitMenu.loadFromFile("assets/texture/Quit_A.png")) {
-    }
-
-    if (!ScoreButton.loadFromFile("assets/texture/score_button.png")) {
-    }
-
-    if (!items_nuke.loadFromFile("assets/texture/potionV2_Nuke.png")) {
-    }
-
-    if (!hp_bar.loadFromFile("assets/test/Health_BAR_01.png")) {
-    }
-
-    if (!particles.loadFromFile("assets/texture/PARTICLES.png")) {
-    }
-
-    if (!MainMenu.loadFromFile("assets/texture/MainMenu.png")) {
-    }
-
-    if (!PlayButton.loadFromFile("assets/texture/play_button.png")) {
-    }
-
-    if (!arrow.loadFromFile("assets/texture/arrow.png")) {
-    }
-
-    if (!SelectNameUI.loadFromFile("assets/texture/playName.png")) {
-    }
-
-    if (!Left_button.loadFromFile("assets/texture/left_button.png")) {
-    }
-
-    if (!Right_button.loadFromFile("assets/texture/right_button.png")) {
-    }
+    items_hp_potion.loadFromFile("assets/texture/potionV2.png");
+    items_strength_potion.loadFromFile("assets/texture/potionV2_Strength.png");
+    items_speed_potion.loadFromFile("assets/texture/potionV2_Speed.png");
+    restartMenu.loadFromFile("assets/texture/Restart_A.png");
+    resumeMenu.loadFromFile("assets/texture/Resume_A.png");
+    restartMenu.loadFromFile("assets/texture/Resume_A.png");
+    HowButton.loadFromFile("assets/texture/how_button.png");
+    ExitButton.loadFromFile("assets/texture/button_exit.png");
+    quitMenu.loadFromFile("assets/texture/Quit_A.png");
+    ScoreButton.loadFromFile("assets/texture/score_button.png");
+    items_nuke.loadFromFile("assets/texture/potionV2_Nuke.png");
+    hp_bar.loadFromFile("assets/test/Health_BAR_01.png");
+    particles.loadFromFile("assets/texture/PARTICLES.png");
+    MainMenu.loadFromFile("assets/texture/MainMenu.png");
+    PlayButton.loadFromFile("assets/texture/play_button.png");
+    arrow.loadFromFile("assets/texture/arrow.png");
+    SelectNameUI.loadFromFile("assets/texture/playName.png");
+    Left_button.loadFromFile("assets/texture/left_button.png");
+    Right_button.loadFromFile("assets/texture/right_button.png");
+    ScoreMenu.loadFromFile("assets/texture/scoreBoard.png");
+    HomeButton.loadFromFile("assets/texture/homeButton.png");
+    resultUI.loadFromFile("assets/texture/result.png");
+    backToLobby.loadFromFile("assets/texture/back.png");
 
     /* SOUND */
     sf::Music music;
-    if (!music.openFromFile("assets/sound/theme_song.ogg")) {
-        printf("LOAD ERROR MUSIC\n");
-    }
+    music.openFromFile("assets/sound/theme_song.ogg");
     sf::Music music_day;
-    if (!music_day.openFromFile("assets/sound/spring_day.wav")) {
-        printf("LOAD ERROR MUSIC\n");
-    }
+    music_day.openFromFile("assets/sound/spring_day.wav");
     music.setLoop(true);
     music.setVolume(20.f);
     music_day.setLoop(true);
@@ -251,16 +332,11 @@ int main()
     sf::Sound sound;
     sf::SoundBuffer buffer_moveSelect;
     sf::Sound sound_moveSelect;
-    if (!buffer_moveSelect.loadFromFile("assets/sound/minecraft_click.ogg")) {
-    }
-    if (!buffer_hit_person.loadFromFile("assets/sound/classic_hurt.ogg")) {
-    }
-    if (!buffer_hit_enemies.loadFromFile("assets/sound/hit_enemies.ogg")) {
-    }
-    if (!buffer_nextR.loadFromFile("assets/sound/counted.ogg")) {
-    }
-    if (!buffer_xp_mc.loadFromFile("assets/sound/XP_MC.ogg")) {
-    }
+    buffer_moveSelect.loadFromFile("assets/sound/minecraft_click.ogg");
+    buffer_hit_person.loadFromFile("assets/sound/classic_hurt.ogg");
+    buffer_hit_enemies.loadFromFile("assets/sound/hit_enemies.ogg");
+    buffer_nextR.loadFromFile("assets/sound/counted.ogg");
+    buffer_xp_mc.loadFromFile("assets/sound/XP_MC.ogg");
 
     sound_hit_enemies.setBuffer(buffer_hit_enemies);
     sound_hit_person.setBuffer(buffer_hit_person);
@@ -293,6 +369,8 @@ int main()
     MainUI.setTexture(&MainMenu);
     sf::RectangleShape SelectNUI(sf::Vector2f(1280.0f, 925.0f));
     SelectNUI.setTexture(&SelectNameUI);
+    sf::RectangleShape ScoreUI_MENU(sf::Vector2f(1280.0f, 925.0f));
+    ScoreUI_MENU.setTexture(&ScoreMenu);
     sf::RectangleShape PlayUI(sf::Vector2f(345.0f, 220.0f));
     PlayUI.setTexture(&PlayButton);
     sf::RectangleShape ScoreUI(sf::Vector2f(345.0f, 220.0f));
@@ -305,6 +383,12 @@ int main()
     LeftButton.setTexture(&Left_button);
     sf::RectangleShape RightButton(sf::Vector2f(200.0f, 200.0f));
     RightButton.setTexture(&Right_button);
+    sf::RectangleShape Home_button(sf::Vector2f(260.0f, 260.0f));
+    Home_button.setTexture(&HomeButton);
+    sf::RectangleShape result_UI(sf::Vector2f(720.0f, 720.0f));
+    result_UI.setTexture(&resultUI);
+    sf::RectangleShape backButtonUI(sf::Vector2f(350.0f, 150.0f));
+    backButtonUI.setTexture(&backToLobby);
 
     sf::RectangleShape PAUSE_UI(sf::Vector2f(1280.0f, 925.0f));
     PAUSE_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(0, 0)));
@@ -321,14 +405,8 @@ int main()
     ScoreBoard.setTexture(&Score);
     //Test2.setTextureRect(sf::IntRect(0, 0, 100, 70));
 
-    if (!mobTexture.loadFromFile("assets/texture/[NW]_MOB_2.png")) {
-        cout << "ERROR MOB TEXTURE" << endl;
-    }
-    if (!mobTexture_2.loadFromFile("assets/texture/[NW]_MOB_3.png")) {
-        cout << "ERROR MOB TEXTURE" << endl;
-    }
-
-    sf::View view_lobby(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(1280.0, 925.0f));
+    mobTexture.loadFromFile("assets/texture/[NW]_MOB_2.png");
+    mobTexture_2.loadFromFile("assets/texture/[NW]_MOB_3.png");
 
     /* MAP LOADER */
     loadMap();
@@ -339,7 +417,6 @@ int main()
     sf::Vector2f aimDir;
     sf::Vector2f aimDirNorm;
     Arrow arrow1;
-    vector<Arrow> arrows;
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
     //Enemies enemy(&mobTexture, sf::Vector2u(5, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100, 5, 10,EnemyType::RANGED); //Enemy type 1
@@ -349,9 +426,10 @@ int main()
 
     /* TEXT */
     sf::Font font;
-    if (!font.loadFromFile("assets/fonts/stradew_font.ttf")) {
-        cout << "ERROR LOADING FONT 1" << endl;
-    }
+    font.loadFromFile("assets/fonts/stradew_font.ttf");
+    sf::Font font_score;
+    font_score.loadFromFile("assets/fonts/arlrdbd.ttf");
+
     vector<sf::Text> score_text_list;
     for (int i = 0; i < 8; i++) {
         sf::Text text;
@@ -369,6 +447,24 @@ int main()
         text.setFillColor(sf::Color(124, 0, 6));
         text.setFont(font);
         text_list.push_back(text);
+    }
+
+    vector<sf::Text> top_board;
+    for (int i = 0; i < 5; i++) {
+        sf::Text text;
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color(124, 0, 6));
+        text.setFont(font);
+        top_board.push_back(text);
+    }
+
+    vector<sf::Text> top_board_score;
+    for (int i = 0; i < 5; i++) {
+        sf::Text text;
+        text.setCharacterSize(50);
+        text.setFillColor(sf::Color(124, 0, 6));
+        text.setFont(font);
+        top_board_score.push_back(text);
     }
 
     text_list[0].setString("WAVE : ");
@@ -402,8 +498,12 @@ int main()
 
     bool isGameStart = false;
     bool isSelectName = false;
+    bool isScoreboard = false;
     float deltaTime = 0.0f;
     float rotation;
+
+    checkDataFile();
+    loadData();
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -420,7 +520,7 @@ int main()
                 music_day.play();
             }
 
-            if (!isPause) {
+            if (!isPause && !player.isDead()) {
 
                 player.setCDShot(player.getCDShot() - elapsedCDTime.restart().asSeconds());
                 player.setStrengthTimer(player.getStrengthTimer() - elapsedCDTime_StrengthTimer.restart().asSeconds());
@@ -504,14 +604,12 @@ int main()
 
                             if (player.getSelectedItems() != 3) {
                                 if (sound.getStatus() == sf::SoundSource::Status::Stopped) {
-                                    if (!buffer.loadFromFile("assets/sound/drinkPotion.ogg")) {
-                                    }
+                                    buffer.loadFromFile("assets/sound/drinkPotion.ogg");
                                 }
                             }
                             else {
                                 if (sound.getStatus() == sf::SoundSource::Status::Stopped) {
-                                    if (!buffer.loadFromFile("assets/sound/Minecraft-Cat.ogg")) {
-                                    }
+                                    buffer.loadFromFile("assets/sound/Minecraft-Cat.ogg");
                                 }
 
                             }
@@ -611,7 +709,7 @@ int main()
 
                             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 
-                                if (!isPause) {
+                                if (!isPause && !player.isDead()) {
                                     arrow1.arrow_obj.setPosition(playerCenter);
                                     arrow1.currVelocity = aimDirNorm * arrow1.maxSpeed;
                                     arrow1.arrow_obj.setRotation(rotation + 360);
@@ -652,7 +750,7 @@ int main()
                     continue;
                 }
 
-                if (!isPause) {
+                if (!isPause && !player.isDead()) {
                     enemies_list[i].Update(player.getBody().getPosition(), deltaTime * 2);
                 }
 
@@ -666,7 +764,7 @@ int main()
             windowRender.draw(player.getBody());
 
             for (int i = 0; i < (int)effect_list.size(); i++) {
-                if (!isPause) {
+                if (!isPause && !player.isDead()) {
                     effect_list[i].update(deltaTime);
                     if (effect_list[i].ISCanRemove()) {
                         effect_list.erase(effect_list.begin() + i);
@@ -687,7 +785,7 @@ int main()
                     continue;
                 }
 
-                if (!isPause) {
+                if (!isPause && !player.isDead()) {
                     enemies_list[i].Update(player.getBody().getPosition(), deltaTime * 2);
                 }
 
@@ -709,7 +807,7 @@ int main()
             for (int i = 0; i < (int)arrows.size(); i++) {
                 bool isHitEnemy = false;
 
-                if (!isPause) {
+                if (!isPause && !player.isDead()) {
                     arrows[i].arrow_obj.move(arrows[i].currVelocity);
 
                     if (arrows[i].arrow_obj.getPosition().x < 0 || arrows[i].arrow_obj.getPosition().y < 0
@@ -816,9 +914,7 @@ int main()
                             sound_nextR.play();
                         }
                     }
-                    if (!resumeMenu.loadFromFile("assets/texture/Resume_B.png")) {
-                        printf("LOAD ERROR TEXTURE\n");
-                    }
+                    resumeMenu.loadFromFile("assets/texture/Resume_B.png");
                     if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                         if (!isSelectedMenu) {
@@ -830,9 +926,7 @@ int main()
                     // cout << "YES!" << endl;
                 }
                 else {
-                    if (!resumeMenu.loadFromFile("assets/texture/Resume_A.png")) {
-                        printf("LOAD ERROR TEXTURE\n");
-                    }
+                    resumeMenu.loadFromFile("assets/texture/Resume_A.png");
                 }
 
                 if (restartUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y)) {
@@ -849,8 +943,7 @@ int main()
                         elapsedCDTime_Esc.restart();
                         elapsedCDTime_NextWave.restart();
                     }
-                    if (!restartMenu.loadFromFile("assets/texture/Restart_B.png")) {
-                    }
+                    restartMenu.loadFromFile("assets/texture/Restart_B.png");
                     if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                         if (!isSelectedMenu) {
@@ -860,8 +953,7 @@ int main()
                     }
                     isSelected++;
                 } else {
-                    if (!restartMenu.loadFromFile("assets/texture/Restart_A.png")) {
-                    }
+                    restartMenu.loadFromFile("assets/texture/Restart_A.png");
                 }
 
                 if (quitUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
@@ -870,8 +962,7 @@ int main()
                         view_lobby.setCenter(640, 925 / 2.0f);
                         deltaTime = 0.0f;
                     }
-                    if (!quitMenu.loadFromFile("assets/texture/Quit_B.png")) {
-                    }
+                    quitMenu.loadFromFile("assets/texture/Quit_B.png");
                     if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                         if (!isSelectedMenu) {
@@ -882,8 +973,7 @@ int main()
                     isSelected++;
                 }
                 else {
-                    if (!quitMenu.loadFromFile("assets/texture/Quit_A.png")) {
-                    }
+                    quitMenu.loadFromFile("assets/texture/Quit_A.png");
                 }
 
                 if (isSelected <= 0) {
@@ -895,6 +985,50 @@ int main()
                 windowRender.draw(resumeUI);
                 windowRender.draw(restartUI);
                 windowRender.draw(quitUI);
+            } else if (player.isDead()) {
+                PAUSE_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(0, 0)));
+                result_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(290, 100)));
+                backButtonUI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(485, 650)));
+
+                sf::Text resultScore;
+                resultScore.setCharacterSize(38);
+                resultScore.setFillColor(sf::Color(129, 116, 116));
+                resultScore.setFont(font_score);
+                resultScore.setStyle(sf::Text::Bold);
+                resultScore.setString(IntToString(player.getScore()));
+                sf::FloatRect textRect = resultScore.getLocalBounds();
+                resultScore.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+                resultScore.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(654, 500)));
+
+                int isSelected = 0;
+
+                if (backButtonUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
+                    if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                        isGameStart = false;
+                        view_lobby.setCenter(640, 925 / 2.0f);
+                        deltaTime = 0.0f;
+                        saveScore(playerInput, player.getScore());
+                    }
+                    backToLobby.loadFromFile("assets/texture/back_A.png");
+                    if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
+
+                        if (!isSelectedMenu) {
+                            sound_xp_mc.play();
+                        }
+                        isSelectedMenu = true;
+                    }
+                    isSelected++;
+                } else {
+                    backToLobby.loadFromFile("assets/texture/back.png");
+                }
+
+                if (isSelected <= 0) {
+                    isSelectedMenu = false;
+                }
+                windowRender.draw(PAUSE_UI);
+                windowRender.draw(result_UI);
+                windowRender.draw(backButtonUI);
+                windowRender.draw(resultScore);
             }
 
             /* SORT ENEMY / ITEMS LOCATION */
@@ -917,8 +1051,10 @@ int main()
                         PlayName.setString(playerInput);
                     } else {
 
-                        if (playerInput.getSize() <= 12) {
+                        if (playerInput.getSize() <= 12 && ((event.text.unicode >= 48 && event.text.unicode <= 57)  || (event.text.unicode >= 65 && event.text.unicode <= 95) ||
+                            (event.text.unicode >= 97 && event.text.unicode <= 125))) {
                             playerInput += event.text.unicode;
+
                             PlayName.setString(playerInput);
                         }
                     }
@@ -935,8 +1071,7 @@ int main()
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     isSelectName = false;
                 }
-                if (!Left_button.loadFromFile("assets/texture/left_button_A.png")) {
-                }
+                Left_button.loadFromFile("assets/texture/left_button_A.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                     if (!isSelectedMenu) {
@@ -946,8 +1081,7 @@ int main()
                 }
                 isSelected++;
             } else {
-                if (!Left_button.loadFromFile("assets/texture/left_button.png")) {
-                }
+                Left_button.loadFromFile("assets/texture/left_button.png");
             }
 
             if (RightButton.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
@@ -965,9 +1099,12 @@ int main()
                     elapsedCDTime_Esc.restart();
                     elapsedCDTime_NextWave.restart();
                     isSelectName = false;
+                    if (playerInput.getSize() <= 0) {
+                        playerInput = "INPUT_NAME_TH";
+                        PlayName.setString(playerInput);
+                    }
                 }
-                if (!Right_button.loadFromFile("assets/texture/right_button_A.png")) {
-                }
+                Right_button.loadFromFile("assets/texture/right_button_A.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                     if (!isSelectedMenu) {
@@ -977,8 +1114,7 @@ int main()
                 }
                 isSelected++;
             } else {
-                if (!Right_button.loadFromFile("assets/texture/right_button.png")) {
-                }
+                Right_button.loadFromFile("assets/texture/right_button.png");
             }
 
             if (isSelected <= 0) {
@@ -990,6 +1126,55 @@ int main()
             windowRender.draw(PlayName);
             windowRender.draw(LeftButton);
             windowRender.draw(RightButton);
+        } else if (isScoreboard) {
+            ScoreUI_MENU.setPosition(sf::Vector2f(0.0f, 0.0f));
+            Home_button.setPosition(sf::Vector2f(510.0f, 620.0f));
+            windowRender.clear(sf::Color::Black);
+
+            while (windowRender.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    windowRender.close();
+                }
+            }
+
+            int isSelected = 0;
+
+            if (Home_button.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    isScoreboard = false;
+                }
+                HomeButton.loadFromFile("assets/texture/homeButton_A.png");
+                if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
+
+                    if (!isSelectedMenu) {
+                        sound_xp_mc.play();
+                    }
+                    isSelectedMenu = true;
+                }
+                isSelected++;
+            } else {
+                HomeButton.loadFromFile("assets/texture/homeButton.png");
+            }
+
+            if (isSelected <= 0) {
+                isSelectedMenu = false;
+            }
+
+            windowRender.draw(ScoreUI_MENU);
+            for (int i = top_board.size() ; i > 0; i--) {
+
+                int index = 5 - i;
+                top_board[i-1].setPosition(sf::Vector2f(260.0f, 300.0f + (index * 65)));
+                top_board_score[i-1].setPosition(sf::Vector2f(800.0f, 300.0f + (index * 65)));
+
+                top_board_score[i-1].setString(IntToString(topPlayers[i-1].score));
+                top_board[i-1].setString(topPlayers[i-1].name);
+                windowRender.draw(top_board[i-1]);
+                windowRender.draw(top_board_score[i-1]);
+            }
+
+
+            windowRender.draw(Home_button);
         } else {
             while (windowRender.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
@@ -1015,9 +1200,7 @@ int main()
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     isSelectName = true;
                 }
-                if (!PlayButton.loadFromFile("assets/texture/play_button_2.png")) {
-                    printf("LOAD ERROR TEXTURE\n");
-                }
+                PlayButton.loadFromFile("assets/texture/play_button_2.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                     if (!isSelectedMenu) {
@@ -1027,17 +1210,14 @@ int main()
                 }
                 isSelected++;
             } else {
-                if (!PlayButton.loadFromFile("assets/texture/play_button.png")) {
-                }
+                PlayButton.loadFromFile("assets/texture/play_button.png");
             }
 
             if (ScoreUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y)) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    isPause = false;
+                    isScoreboard = true;
                 }
-                if (!ScoreButton.loadFromFile("assets/texture/score_button_2.png")) {
-                    printf("LOAD ERROR TEXTURE\n");
-                }
+                ScoreButton.loadFromFile("assets/texture/score_button_2.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                     if (!isSelectedMenu) {
@@ -1047,17 +1227,14 @@ int main()
                 }
                 isSelected++;
             } else {
-                if (!ScoreButton.loadFromFile("assets/texture/score_button.png")) {
-                }
+                ScoreButton.loadFromFile("assets/texture/score_button.png");
             }
 
             if (HowUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     isPause = false;
                 }
-                if (!HowButton.loadFromFile("assets/texture/how_button_2.png")) {
-                    printf("LOAD ERROR TEXTURE\n");
-                }
+                HowButton.loadFromFile("assets/texture/how_button_2.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                     if (!isSelectedMenu) {
@@ -1067,8 +1244,7 @@ int main()
                 }
                 isSelected++;
             } else {
-                if (!HowButton.loadFromFile("assets/texture/how_button.png")) {
-                }
+                HowButton.loadFromFile("assets/texture/how_button.png");
             }
 
             if (ExitUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
@@ -1076,9 +1252,7 @@ int main()
                     isPause = false;
                     windowRender.close();
                 }
-                if (!ExitButton.loadFromFile("assets/texture/button_exit_2.png")) {
-                    printf("LOAD ERROR TEXTURE\n");
-                }
+                ExitButton.loadFromFile("assets/texture/button_exit_2.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
 
                     if (!isSelectedMenu) {
@@ -1089,8 +1263,7 @@ int main()
                 isSelected++;
             }
             else {
-                if (!ExitButton.loadFromFile("assets/texture/button_exit.png")) {
-                }
+                ExitButton.loadFromFile("assets/texture/button_exit.png");
             }
 
             if (isSelected <= 0) {

@@ -44,6 +44,10 @@ bool Animation::Update(int row, float deltaTime,int uvRectLeft,int uvRectTop) {
 		currentImage.x = 0;
 	}
 
+	if (currentImage.y >= imageCount.y) {
+		currentImage.y = 0;
+	}
+
 	uvRect.left = currentImage.x * uvRectLeft;
 	uvRect.top = currentImage.y * uvRectTop;
 	return false;

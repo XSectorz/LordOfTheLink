@@ -45,6 +45,10 @@ extern sf::Texture SelectNameUI;
 extern sf::Texture arrow;
 extern sf::Texture Left_button;
 extern sf::Texture Right_button;
+extern sf::Texture ScoreMenu;
+extern sf::Texture resultUI;
+extern sf::Texture HomeButton;
+extern sf::Texture backToLobby;
 extern float cooldownNext;
 extern bool isNext;
 

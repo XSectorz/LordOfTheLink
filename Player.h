@@ -44,6 +44,8 @@ public:
 	void nextSelectedItems();
 	void previousSelectedItems();
 	void reStartPlayer();
+	bool isDead() { return this->Death; }
+	void setIsDead(bool isDead) { this->Death = isDead; }
 
 	sf::Vector2f getCurrentPosition() { return body.getPosition(); }
 
@@ -58,6 +60,7 @@ private:
 	float speed;
 	float health = 100;
 	float cd_shot = 0.25;
+	bool Death = false;
 	int score = 0;
 	int selectedItems = 0;
 	int ItemCount[4] = {0,0,0,0};

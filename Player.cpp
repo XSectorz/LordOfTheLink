@@ -52,6 +52,7 @@ void Player::reStartPlayer() {
 	this->strength_timer = 0.0f;
 	this->cd_shot = 0.25;
 	this->score = 0;
+	this->Death = false;
 	this->selectedItems = 0;
 	this->ItemCount[0] = 0;
 	this->ItemCount[1] = 0;
