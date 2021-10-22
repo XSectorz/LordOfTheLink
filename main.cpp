@@ -130,6 +130,7 @@ void StartGame() {
     items_list.clear();
     WaveController.setWave(0);
     arrows.clear();
+    effect_list.clear();
 }
 
 sf::String IntToString(int num) {
@@ -316,6 +317,8 @@ int main()
     HomeButton.loadFromFile("assets/texture/homeButton.png");
     resultUI.loadFromFile("assets/texture/result.png");
     backToLobby.loadFromFile("assets/texture/back.png");
+    HowtoPlay.loadFromFile("assets/texture/howtoPlay.png");
+    BacktoMain.loadFromFile("assets/texture/back.png");
 
     /* SOUND */
     sf::Music music;
@@ -337,15 +340,24 @@ int main()
     buffer_hit_enemies.loadFromFile("assets/sound/hit_enemies.ogg");
     buffer_nextR.loadFromFile("assets/sound/counted.ogg");
     buffer_xp_mc.loadFromFile("assets/sound/XP_MC.ogg");
+    buffer_lose.loadFromFile("assets/sound/losing.wav");
+    buffer_shot.loadFromFile("assets/sound/bow_shoot.ogg");
+    buffer_pickup.loadFromFile("assets/sound/pickup_items.ogg");
 
     sound_hit_enemies.setBuffer(buffer_hit_enemies);
     sound_hit_person.setBuffer(buffer_hit_person);
     sound_nextR.setBuffer(buffer_nextR);
     sound_xp_mc.setBuffer(buffer_xp_mc);
+    sound_lose.setBuffer(buffer_lose);
+    sound_shot.setBuffer(buffer_shot);
+    sound_pickup.setBuffer(buffer_pickup);
 
     sound_hit_enemies.setVolume(20.f);
     sound_nextR.setVolume(20.f);
     sound_hit_person.setVolume(20.f);
+    sound_lose.setVolume(20.f);
+    sound_shot.setVolume(20.f);
+    sound_pickup.setVolume(20.f);
 
     /* SETTING GAME*/
     sf::RectangleShape MapBackground(sf::Vector2f(1920.0f, 1920.0f));
@@ -371,6 +383,8 @@ int main()
     SelectNUI.setTexture(&SelectNameUI);
     sf::RectangleShape ScoreUI_MENU(sf::Vector2f(1280.0f, 925.0f));
     ScoreUI_MENU.setTexture(&ScoreMenu);
+    sf::RectangleShape HowToUI(sf::Vector2f(1280.0f, 925.0f));
+    HowToUI.setTexture(&HowtoPlay);
     sf::RectangleShape PlayUI(sf::Vector2f(345.0f, 220.0f));
     PlayUI.setTexture(&PlayButton);
     sf::RectangleShape ScoreUI(sf::Vector2f(345.0f, 220.0f));
@@ -389,6 +403,8 @@ int main()
     result_UI.setTexture(&resultUI);
     sf::RectangleShape backButtonUI(sf::Vector2f(350.0f, 150.0f));
     backButtonUI.setTexture(&backToLobby);
+    sf::RectangleShape backToMain_HOW(sf::Vector2f(350.0f, 150.0f));
+    backToMain_HOW.setTexture(&BacktoMain);
 
     sf::RectangleShape PAUSE_UI(sf::Vector2f(1280.0f, 925.0f));
     PAUSE_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(0, 0)));
@@ -484,6 +500,7 @@ int main()
 
     float cd_selectedItems = 0.0f;
     float cd_esc = 0.0f;
+    float cd_click = 0.0f;
     sf::Clock clock;
     sf::Clock elapsedCDTime;
     sf::Clock elapsedCDTime_SelectedItem;
@@ -491,6 +508,7 @@ int main()
     sf::Clock elapsedCDTime_SpeedTimer;
     sf::Clock elapsedCDTime_Esc;
     sf::Clock elapsedCDTime_NextWave;
+    sf::Clock elapsedCDTime_ClickMenu;
 
     bool isPause = false;
     WalkTypes walkType;
@@ -499,6 +517,7 @@ int main()
     bool isGameStart = false;
     bool isSelectName = false;
     bool isScoreboard = false;
+    bool isHowto = false;
     float deltaTime = 0.0f;
     float rotation;
 
@@ -509,7 +528,7 @@ int main()
         sf::Event event;
 
         mousePosWindow = windowRender.mapPixelToCoords(sf::Mouse::getPosition(windowRender));
-
+        cd_click -= elapsedCDTime_ClickMenu.restart().asSeconds();
         if (isGameStart) {
 
             windowRender.clear(sf::Color::Black);
@@ -714,6 +733,7 @@ int main()
                                     arrow1.currVelocity = aimDirNorm * arrow1.maxSpeed;
                                     arrow1.arrow_obj.setRotation(rotation + 360);
                                     arrows.push_back(Arrow(arrow1));
+                                    sound_shot.play();
 
                                     if (player.getStrengthTimer() < 0) {
                                         player.setCDShot(0.25f);
@@ -1067,9 +1087,10 @@ int main()
             RightButton.setPosition(sf::Vector2f(990.0f, 500.0f));
             PlayName.setPosition(sf::Vector2f(660.0f, 305.0f));
 
-            if (LeftButton.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
+            if (LeftButton.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0 && cd_click <= 0) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     isSelectName = false;
+                    cd_click = 0.5f;
                 }
                 Left_button.loadFromFile("assets/texture/left_button_A.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
@@ -1100,6 +1121,10 @@ int main()
                     elapsedCDTime_NextWave.restart();
                     isSelectName = false;
                     if (playerInput.getSize() <= 0) {
+                        playerInput = "INPUT_NAME_TH";
+                        PlayName.setString(playerInput);
+                    }
+                    if (playerInput == "NO_DATA") {
                         playerInput = "INPUT_NAME_TH";
                         PlayName.setString(playerInput);
                     }
@@ -1140,8 +1165,9 @@ int main()
             int isSelected = 0;
 
             if (Home_button.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cd_click <= 0) {
                     isScoreboard = false;
+                    cd_click = 0.5f;
                 }
                 HomeButton.loadFromFile("assets/texture/homeButton_A.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
@@ -1175,6 +1201,43 @@ int main()
 
 
             windowRender.draw(Home_button);
+        } else if (isHowto) {
+            while (windowRender.pollEvent(event)) {
+                if (event.type == sf::Event::Closed) {
+                    windowRender.close();
+                }
+            }
+            HowToUI.setPosition(sf::Vector2f(0.0f, 0.0f));
+            backToMain_HOW.setPosition(sf::Vector2f(800.0f, 700.0f));
+
+            int isSelected = 0;
+
+            if (backToMain_HOW.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cd_click <= 0) {
+                    isHowto = false;
+                    cd_click = 0.5f;
+                }
+                BacktoMain.loadFromFile("assets/texture/back_A.png");
+                if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
+
+                    if (!isSelectedMenu) {
+                        sound_xp_mc.play();
+                    }
+                    isSelectedMenu = true;
+                }
+                isSelected++;
+            } else {
+                BacktoMain.loadFromFile("assets/texture/back.png");
+            }
+
+            if (isSelected <= 0) {
+                isSelectedMenu = false;
+            }
+
+            windowRender.clear(sf::Color::Black);
+
+            windowRender.draw(HowToUI);
+            windowRender.draw(backToMain_HOW);
         } else {
             while (windowRender.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
@@ -1214,7 +1277,7 @@ int main()
             }
 
             if (ScoreUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y)) {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cd_click <= 0) {
                     isScoreboard = true;
                 }
                 ScoreButton.loadFromFile("assets/texture/score_button_2.png");
@@ -1231,8 +1294,8 @@ int main()
             }
 
             if (HowUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    isPause = false;
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cd_click <= 0) {
+                    isHowto = true;
                 }
                 HowButton.loadFromFile("assets/texture/how_button_2.png");
                 if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
@@ -1248,8 +1311,7 @@ int main()
             }
 
             if (ExitUI.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    isPause = false;
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cd_click <= 0) {
                     windowRender.close();
                 }
                 ExitButton.loadFromFile("assets/texture/button_exit_2.png");

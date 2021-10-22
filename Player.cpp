@@ -325,6 +325,7 @@ WalkTypes Player::Update(float deltaTime,int rotationType) {
 	for (int i = 0; i < (int)items_list.size(); i++) {
 		if (GetCollinder().CheckCollision(items_list[i].GetCollinder())) {
 			addItem(items_list[i].GetItemType());
+			sound_pickup.play();
 			items_list.erase(items_list.begin() + i);
 		}
 	}

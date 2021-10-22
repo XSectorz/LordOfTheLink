@@ -25,6 +25,7 @@ sf::Texture ExitButton;
 sf::Texture HowButton;
 sf::Texture ScoreMenu;
 sf::Texture HomeButton;
+sf::Texture BacktoMain;
 sf::SoundBuffer buffer_hit_person;
 sf::Sound sound_hit_person;
 sf::SoundBuffer buffer_hit_enemies;
@@ -39,6 +40,14 @@ sf::Texture Left_button;
 sf::Texture resultUI;
 sf::Texture Right_button;
 sf::Texture backToLobby;
+sf::SoundBuffer buffer_lose;
+sf::Sound sound_lose;
+sf::SoundBuffer buffer_shot;
+sf::Sound sound_shot;
+sf::SoundBuffer buffer_pickup;
+sf::Sound sound_pickup;
+sf::Texture HowtoPlay;
+
 
 float cooldownNext = 0.0f;
 bool isNext = false;
