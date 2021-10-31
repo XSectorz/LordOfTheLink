@@ -3,7 +3,7 @@
 class WaveHandler
 {
 
-	static const int monsterCount = 2;
+	static const int monsterCount = 5;
 
 public:
 	WaveHandler();
@@ -14,10 +14,17 @@ public:
 	int getMonsterCount() { return monsterCount; }
 	int getMonsterCountByIndex(int index) { return this->arrayMonster[index]; }
 	int getMonsterMultipleByIndex(int index) { return this->multipleBy[index]; }
+	float getAgressiveModeTimer() { return this->agressiveMode; }
+	void removeAgressiveModeTimer(float agressiveMode) { this->agressiveMode = this->agressiveMode - agressiveMode; }
+	void setAgressiveModeTimer(float agressiveMode) { this->agressiveMode = agressiveMode; }
+	bool isAgressiveMode() { return this->isOnAgressiveMode; }
+	void setAgressiveMode(bool isAgress) { this->isOnAgressiveMode = isAgress; }
 
 private:
 	int CurrentWave = 0;
-	int arrayMonster[monsterCount] = { 0,0 }; //0 = MELEE // 1 = RANGED (Count of monster)
-	int multipleBy[monsterCount] = {2,1}; //Added count of mob by (x)
+	float agressiveMode = 30;
+	bool isOnAgressiveMode = false;
+	int arrayMonster[monsterCount] = { 0,0,0,0,0 }; //0 = MELEE // 1 = RANGED //MINI_BOSS 1  //KNIGHT //WIZARD (Count of monster)
+	int multipleBy[monsterCount] = {1,1,1,1,1}; //Added count of mob by (x)
 };
 

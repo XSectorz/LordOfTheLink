@@ -13,8 +13,8 @@ WaveHandler::WaveHandler() {
 void spawnEnemies(vector<Enemies>& enemies_list, int mobsType) {
 	int Index;
 	float speed_x,speed_y;
-	speed_x = (float) (rand() % (5) + 1.25);
-	speed_y = (float)(rand() % (5) + 1.25);
+	speed_x = (float) (rand() % (4) + 1.25);
+	speed_y = (float)(rand() % (4) + 1.25);
 
 	Index = (int) (rand() % (6) + 0);
 
@@ -23,11 +23,19 @@ void spawnEnemies(vector<Enemies>& enemies_list, int mobsType) {
 	//cout << "Spawn at: " << spawnPos[Index].x << "," << spawnPos[Index].y << endl;
 
 	if (mobsType == 0) {
-		Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x-0.5f, speed_y-0.5f), 50, 50, 10, 800, EnemyType::NORMAL); //Enemy Type 1
+		Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.6f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x-0.25f, speed_y-0.25f), 40, 40, 3, 8, EnemyType::NORMAL); //Enemy Type 1
 		enemies_list.push_back(enemy);
-	}
-	else if (mobsType == 1) {
-		Enemies enemy(&mobTexture_2, sf::Vector2u(3, 10), 0.3f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x+0.25f, speed_y+0.25f), 10, 10, 1, 10, EnemyType::RANGED); //Enemy Type 2
+	} else if (mobsType == 1) {
+		Enemies enemy(&mobTexture_2, sf::Vector2u(5, 10), 0.45f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x+0.2f, speed_y+0.2f), 30, 30, 4, 15, EnemyType::RANGED); //Enemy Type 2
+		enemies_list.push_back(enemy);
+	} else if (mobsType == 2) {
+		Enemies enemy(&mobTexture_3, sf::Vector2u(6, 10), 0.3f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 150, 150, 10, 100, EnemyType::MINI_BOSS); //Enemy Type 3
+		enemies_list.push_back(enemy);
+	} else if (mobsType == 3) {
+		Enemies enemy(&mobTexture_4, sf::Vector2u(6, 10), 0.45f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 80, 80, 5, 20, EnemyType::KNIGHT); //Enemy Type 4
+		enemies_list.push_back(enemy);
+	} else if (mobsType == 4) {
+		Enemies enemy(&mobTexture_5, sf::Vector2u(4, 10), 1.f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 70, 70, Damage_Wizard, 20, EnemyType::WIZARD); //Enemy Type 5
 		enemies_list.push_back(enemy);
 	}
 }
@@ -61,7 +69,12 @@ void spawnItems(int amount) {
 			items_list.push_back(items);
 			cout << "SPAWN POTION " << " TYPE: " << 3 << endl;
 		}
-
+		else if (randItemType == 4) {
+			Items items(&items_shield, spawnPos[Index], 4);
+			items_list.push_back(items);
+			cout << "SPAWN POTION " << " TYPE: " << 4 << endl;
+		}
+		cout << "SPAWN2 " << " TYPE: " << randItemType << endl;
 	}
 
 }
@@ -73,9 +86,37 @@ void WaveHandler::NextRoundUpdate(int cWave) {
 	cout << "NEXT WAVE: " << cWave << endl;
 
 	for (int i = 0; i < mobC ; i++) {
+
+		if (cWave % 5 == 0) {
+			if (i != 2) {
+				continue;
+			}
+		}
+		
+		if (cWave >= 10) {
+			if (i == 0 || i == 1) {
+				continue;
+			}
+		} else if (cWave >= 1 && cWave <= 5 && cWave % 5 != 0) {
+			if (i >= 2) {
+				continue;
+			}
+		}
+
 		int MobCountIndex = getMonsterCountByIndex(i);
 
-		int spawnAmount = MobCountIndex + (cWave*getMonsterMultipleByIndex(i));
+		int spawnAmount = MobCountIndex + (((cWave/2)*getMonsterMultipleByIndex(i))+1);
+
+		if (cWave % 5 == 0) {
+			spawnAmount = cWave/5;
+		}
+
+		if (cWave >= 5) {
+			spawnAmount = (spawnAmount / 2)-1;
+			if (spawnAmount <= 0) {
+				spawnAmount = 1;
+			}
+		}
 		
 		cout << "SPAWN MOB: " << i << " Amount: " << spawnAmount << endl;
 		for (int j = 0; j < spawnAmount; j++) {

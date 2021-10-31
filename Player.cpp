@@ -58,6 +58,7 @@ void Player::reStartPlayer() {
 	this->ItemCount[1] = 0;
 	this->ItemCount[2] = 0;
 	this->ItemCount[3] = 0;
+	this->ItemCount[4] = 0;
 	body.setTextureRect(sf::IntRect(0, 0, 60, 66));
 	row = 0;
 
@@ -65,7 +66,7 @@ void Player::reStartPlayer() {
 
 void Player::nextSelectedItems() {
 	this->selectedItems += 1;
-	if (this->selectedItems > 3) {
+	if (this->selectedItems > 4) {
 		this->selectedItems = 0;
 	}
 }
@@ -73,7 +74,7 @@ void Player::nextSelectedItems() {
 void Player::previousSelectedItems() {
 	this->selectedItems -= 1;
 	if (this->selectedItems < 0) {
-		this->selectedItems = 3;
+		this->selectedItems = 4;
 	}
 }
 

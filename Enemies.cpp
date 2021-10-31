@@ -28,13 +28,22 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 
 void Enemies::deathEvent() {
 	
-	cout << "DEAD ! CURRENT: " << enemies_list.size() << endl;
 
 	if (enemies_list.size() == 1) { //DEATH LAST GO TO NEXT ROUND
 		isNext = true;
 		cooldownNext = 4.0f;
 		sound_nextR.play();
+		WaveController.setAgressiveMode(false);
+		WaveController.setAgressiveModeTimer(30);
+		if (music_Hard.getStatus() == sf::SoundSource::Status::Playing) {
+			music_day.play();
+			music_Hard.stop();
+		}
 	}
+	if (!WaveController.isAgressiveMode()) {
+		WaveController.setAgressiveModeTimer(30);
+	}
+	cout << "DEAD ! CURRENT: " << enemies_list.size() << endl;
 }
 
 sf::Vector2f Enemies::getArrayPosition() {
@@ -54,6 +63,12 @@ int Enemies::getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPos
 				animation.ChangeImageCount(4);
 			} else if (enemyType == EnemyType::RANGED) {
 				animation.ChangeImageCount(6);
+			} else if (enemyType == EnemyType::MINI_BOSS) {
+				animation.ChangeImageCount(4);
+			} else if (enemyType == EnemyType::KNIGHT) {
+				animation.ChangeImageCount(4);
+			} else if (enemyType == EnemyType::WIZARD) {
+				animation.ChangeImageCount(4);
 			}
 			return 6;
 		}
@@ -62,6 +77,12 @@ int Enemies::getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPos
 			animation.ChangeImageCount(3);
 		} else if (enemyType == EnemyType::RANGED) {
 			animation.ChangeImageCount(5);
+		} else if (enemyType == EnemyType::MINI_BOSS) {
+			animation.ChangeImageCount(6);
+		} else if (enemyType == EnemyType::KNIGHT) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::WIZARD) {
+			animation.ChangeImageCount(4);
 		}
 		return 2;
 	} else if (EnemyPosition.x >= playerPosition.x) { // PLAYER <- ENEMY
@@ -70,6 +91,12 @@ int Enemies::getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPos
 				animation.ChangeImageCount(4);
 			} else if (enemyType == EnemyType::RANGED) {
 				animation.ChangeImageCount(6);
+			} else if (enemyType == EnemyType::MINI_BOSS) {
+				animation.ChangeImageCount(4);
+			} else if (enemyType == EnemyType::KNIGHT) {
+				animation.ChangeImageCount(4);
+			} else if (enemyType == EnemyType::WIZARD) {
+				animation.ChangeImageCount(4);
 			}
 			return 4;
 		}
@@ -78,32 +105,68 @@ int Enemies::getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPos
 			animation.ChangeImageCount(3);
 		} else if (enemyType == EnemyType::RANGED) {
 			animation.ChangeImageCount(5);
+		} else if (enemyType == EnemyType::MINI_BOSS) {
+			animation.ChangeImageCount(6);
+		} else if (enemyType == EnemyType::KNIGHT) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::WIZARD) {
+			animation.ChangeImageCount(4);
 		}
 		return 0;
 	}
 }
 
 int Enemies::getAnimationHit(int currentAnimation) {
-	if (currentAnimation == 0) {
+	if (currentAnimation == 0) { //LEFT
 		if (enemyType == EnemyType::NORMAL) {
 			animation.ChangeImageCount(3);
 		} else if (enemyType == EnemyType::RANGED) {
 			animation.ChangeImageCount(5);
+		} else if (enemyType == EnemyType::MINI_BOSS) {
+			animation.ChangeImageCount(6);
+		} else if (enemyType == EnemyType::KNIGHT) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::WIZARD) {
+			animation.ChangeImageCount(4);
 		}
 		return 1;
-	} else if (currentAnimation == 2) {
+	} else if (currentAnimation == 2) { //RIGHT
 		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::RANGED) {
 			animation.ChangeImageCount(5);
+		} else if (enemyType == EnemyType::MINI_BOSS) {
+			animation.ChangeImageCount(6);
+		} else if (enemyType == EnemyType::KNIGHT) {
+			animation.ChangeImageCount(3);
+		} else if (enemyType == EnemyType::WIZARD) {
+			animation.ChangeImageCount(4);
 		}
 		return 3;
-	} else if (currentAnimation == 4) {
+	} else if (currentAnimation == 4) { //ATTACK LEFT
 		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(4);
+		} else if (enemyType == EnemyType::RANGED) {
 			animation.ChangeImageCount(6);
+		} else if (enemyType == EnemyType::MINI_BOSS) {
+			animation.ChangeImageCount(4);
+		} else if (enemyType == EnemyType::KNIGHT) {
+			animation.ChangeImageCount(4);
+		} else if (enemyType == EnemyType::WIZARD) {
+			animation.ChangeImageCount(4);
 		}
 		return 5;
-	} else if (currentAnimation == 6) {
+	} else if (currentAnimation == 6) { //ATTACK RIGHT
 		if (enemyType == EnemyType::NORMAL) {
+			animation.ChangeImageCount(4);
+		} else if (enemyType == EnemyType::RANGED) {
 			animation.ChangeImageCount(6);
+		} else if (enemyType == EnemyType::MINI_BOSS) {
+			animation.ChangeImageCount(4);
+		} else if (enemyType == EnemyType::KNIGHT) {
+			animation.ChangeImageCount(4);
+		} else if (enemyType == EnemyType::WIZARD) {
+			animation.ChangeImageCount(4);
 		}
 		return 7;
 	}
@@ -163,17 +226,36 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 		}
 		if (isAttack_Success) {
 			if (enemyType == EnemyType::RANGED) {
-				Effect effect(&particles, sf::Vector2u(3, 10), 0.3f);
+				Effect effect(&particles, sf::Vector2u(3, 10), 0.3f, 0, player.getCurrentPosition());
+				effect_list.push_back(effect);
+			} else if (enemyType == EnemyType::WIZARD) {
+				sf::Vector2f tempPos(player.getCurrentPosition().x, player.getCurrentPosition().y+20);
+				Effect effect(&particles, sf::Vector2u(7, 10), 0.3f, 1, tempPos);
 				effect_list.push_back(effect);
 			}
-			//cout << "ATTACK SUCCESSFUL" << endl;
-			player.setHealth(player.getHealth() - damage);
-			//cout << "HEALTH: " << player.getHealth() << endl;
-			sound_hit_person.play();
 
-			if (player.getHealth() <= 0) {
-				player.setIsDead(true);
-				sound_lose.play();
+			if (enemyType != EnemyType::WIZARD) {
+				//cout << "ATTACK SUCCESSFUL" << endl;
+
+				float multiple = 1;
+
+				if (WaveController.isAgressiveMode()) {
+					multiple = 2;
+				}
+
+				if (player.getInvincibleTimer() <= 0) {
+					player.setHealth(player.getHealth() - (damage*multiple));
+					//cout << "HEALTH: " << player.getHealth() << endl;
+					sound_hit_person.play();
+
+					if (player.getHealth() <= 0) {
+						player.setIsDead(true);
+						sound_lose.play();
+					}
+
+				} else {
+					sound_block.play();
+				}
 			}
 		}
 		return;
@@ -200,6 +282,14 @@ void Enemies::Update(sf::Vector2f playerPosition,float deltaTime_Enemy) {
 
 	if (enemyType == EnemyType::RANGED) {
 		if (distance <= 200) {
+			if (ISAttack()) { //Attack cant move
+				return;
+			}
+			setIsAttack(true);
+			return;
+		}
+	} else if (enemyType == EnemyType::WIZARD) {
+		if (distance <= 299) {
 			if (ISAttack()) { //Attack cant move
 				return;
 			}

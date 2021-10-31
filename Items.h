@@ -6,7 +6,7 @@ class Items
 {
 
 public:
-	//ITEM TYPE 0 = HPPotion 1 = Strength Potion 2 = Speed Potion
+	//ITEM TYPE 0 = HPPotion 1 = Strength Potion 2 = Speed Potion 3 = Nuke 4 = Shield
 
 	Items(sf::Texture* texture,sf::Vector2f position,int type);
 	sf::RectangleShape getBody() { return this->body; }

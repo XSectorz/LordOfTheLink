@@ -5,7 +5,7 @@
 #include "Animation.h"
 
 
-enum class EnemyType { NORMAL, RANGED };
+enum class EnemyType { NORMAL, RANGED, KNIGHT , WIZARD , MINI_BOSS };
 
 class Enemies
 {

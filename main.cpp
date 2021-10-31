@@ -131,6 +131,8 @@ void StartGame() {
     WaveController.setWave(0);
     arrows.clear();
     effect_list.clear();
+    WaveController.setAgressiveMode(false);
+    WaveController.setAgressiveModeTimer(30);
 }
 
 sf::String IntToString(int num) {
@@ -297,6 +299,7 @@ int main()
     items_hp_potion.loadFromFile("assets/texture/potionV2.png");
     items_strength_potion.loadFromFile("assets/texture/potionV2_Strength.png");
     items_speed_potion.loadFromFile("assets/texture/potionV2_Speed.png");
+    items_shield.loadFromFile("assets/texture/potionV2_Shield.png");
     restartMenu.loadFromFile("assets/texture/Restart_A.png");
     resumeMenu.loadFromFile("assets/texture/Resume_A.png");
     restartMenu.loadFromFile("assets/texture/Resume_A.png");
@@ -319,17 +322,20 @@ int main()
     backToLobby.loadFromFile("assets/texture/back.png");
     HowtoPlay.loadFromFile("assets/texture/howtoPlay.png");
     BacktoMain.loadFromFile("assets/texture/back.png");
+    ClockTimer.loadFromFile("assets/texture/ClockTimer.png");
 
     /* SOUND */
     sf::Music music;
     music.openFromFile("assets/sound/theme_song.ogg");
-    sf::Music music_day;
     music_day.openFromFile("assets/sound/spring_day.wav");
     music.setLoop(true);
     music.setVolume(20.f);
     music_day.setLoop(true);
     music_day.setVolume(20.f);
     music.play();
+    music_Hard.openFromFile("assets/sound/HardMode.ogg");
+    music_Hard.setLoop(true);
+    music_Hard.setVolume(20.f);
 
     sf::SoundBuffer buffer;
     sf::Sound sound;
@@ -343,6 +349,7 @@ int main()
     buffer_lose.loadFromFile("assets/sound/losing.wav");
     buffer_shot.loadFromFile("assets/sound/bow_shoot.ogg");
     buffer_pickup.loadFromFile("assets/sound/pickup_items.ogg");
+    buffer_block.loadFromFile("assets/sound/Shield.ogg");
 
     sound_hit_enemies.setBuffer(buffer_hit_enemies);
     sound_hit_person.setBuffer(buffer_hit_person);
@@ -351,6 +358,7 @@ int main()
     sound_lose.setBuffer(buffer_lose);
     sound_shot.setBuffer(buffer_shot);
     sound_pickup.setBuffer(buffer_pickup);
+    sound_block.setBuffer(buffer_block);
 
     sound_hit_enemies.setVolume(20.f);
     sound_nextR.setVolume(20.f);
@@ -358,6 +366,7 @@ int main()
     sound_lose.setVolume(20.f);
     sound_shot.setVolume(20.f);
     sound_pickup.setVolume(20.f);
+    sound_block.setVolume(20.f);
 
     /* SETTING GAME*/
     sf::RectangleShape MapBackground(sf::Vector2f(1920.0f, 1920.0f));
@@ -373,6 +382,8 @@ int main()
 
     sf::RectangleShape resumeUI(sf::Vector2f(350.0f, 75.0f));
     resumeUI.setTexture(&resumeMenu);
+    sf::RectangleShape ClockTimerSprite(sf::Vector2f(100.0f, 100.0f));
+    ClockTimerSprite.setTexture(&ClockTimer);
     sf::RectangleShape restartUI(sf::Vector2f(350.0f, 75.0f));
     restartUI.setTexture(&restartMenu);
     sf::RectangleShape quitUI(sf::Vector2f(350.0f, 75.0f));
@@ -410,6 +421,9 @@ int main()
     PAUSE_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(0, 0)));
     PAUSE_UI.setFillColor(sf::Color(55,55,55,127));
 
+    sf::RectangleShape AGRESSIVE_UI(sf::Vector2f(1280.0f, 925.0f));
+    AGRESSIVE_UI.setFillColor(sf::Color(215, 62, 62, 127));
+
     sf::RectangleShape Weapon(sf::Vector2f(160.0f, 128.0f));
     Weapon.setOrigin(Weapon.getSize() / 2.0f);
     Weapon.setTexture(&Bow);
@@ -423,6 +437,9 @@ int main()
 
     mobTexture.loadFromFile("assets/texture/[NW]_MOB_2.png");
     mobTexture_2.loadFromFile("assets/texture/[NW]_MOB_3.png");
+    mobTexture_3.loadFromFile("assets/texture/[NW]_MOB_4.png");
+    mobTexture_4.loadFromFile("assets/texture/[NW]_MOB_5.png");
+    mobTexture_5.loadFromFile("assets/texture/[NW]_MOB_6.png");
 
     /* MAP LOADER */
     loadMap();
@@ -506,9 +523,11 @@ int main()
     sf::Clock elapsedCDTime_SelectedItem;
     sf::Clock elapsedCDTime_StrengthTimer;
     sf::Clock elapsedCDTime_SpeedTimer;
+    sf::Clock elapsedCDTime_InvincibleTimer;
     sf::Clock elapsedCDTime_Esc;
     sf::Clock elapsedCDTime_NextWave;
     sf::Clock elapsedCDTime_ClickMenu;
+    sf::Clock elapsedCDTime_AgressiveMode;
 
     bool isPause = false;
     WalkTypes walkType;
@@ -523,6 +542,8 @@ int main()
 
     checkDataFile();
     loadData();
+
+    int rotation_a = 360;
 
     while (windowRender.isOpen()) {
         sf::Event event;
@@ -544,11 +565,11 @@ int main()
                 player.setCDShot(player.getCDShot() - elapsedCDTime.restart().asSeconds());
                 player.setStrengthTimer(player.getStrengthTimer() - elapsedCDTime_StrengthTimer.restart().asSeconds());
                 player.setSpeedTimer(player.getSpeedTimer() - elapsedCDTime_SpeedTimer.restart().asSeconds());
+                player.setInvincibleTimer(player.getInvincibleTimer() - elapsedCDTime_InvincibleTimer.restart().asSeconds());
                 cd_selectedItems -= elapsedCDTime_SelectedItem.restart().asSeconds();
                 deltaTime = clock.restart().asSeconds();
+                WaveController.setAgressiveModeTimer(WaveController.getAgressiveModeTimer() - elapsedCDTime_AgressiveMode.restart().asSeconds());
                 cooldownNext -= elapsedCDTime_NextWave.restart().asSeconds();
-
-               // cout << deltaTime << endl;
 
                 if ((player.getArrayPosition().x >= 25 && player.getArrayPosition().y >= 29) || (player.getArrayPosition().x <= 13 && player.getArrayPosition().y >= 29) || (player.getArrayPosition().x <= 13 && player.getArrayPosition().y <= 10) || (player.getArrayPosition().x >= 25 && player.getArrayPosition().y <= 10)) {
                     if (isOutOfScreen_type == 1) { //Left To Top Window
@@ -604,6 +625,15 @@ int main()
 
                 walkType = player.Update(deltaTime, RotationType);
 
+                if (WaveController.getAgressiveModeTimer() <= 0) {
+
+                    WaveController.setAgressiveMode(true);
+                    if (music_day.getStatus() == sf::SoundSource::Status::Playing) {
+                        music_day.stop();
+                        music_Hard.play();
+                    }
+                }
+
                 if (cd_selectedItems <= 0) {
 
                     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
@@ -621,14 +651,19 @@ int main()
                         if (player.getItems(player.getSelectedItems()) > 0) {
                             player.removeItem(player.getSelectedItems());
 
-                            if (player.getSelectedItems() != 3) {
+                            if (player.getSelectedItems() != 3 && player.getSelectedItems() != 4) {
                                 if (sound.getStatus() == sf::SoundSource::Status::Stopped) {
                                     buffer.loadFromFile("assets/sound/drinkPotion.ogg");
                                 }
                             }
                             else {
                                 if (sound.getStatus() == sf::SoundSource::Status::Stopped) {
-                                    buffer.loadFromFile("assets/sound/Minecraft-Cat.ogg");
+                                    if (player.getSelectedItems() == 3) {
+                                        buffer.loadFromFile("assets/sound/Minecraft-Cat.ogg");
+                                    }
+                                    else if (player.getSelectedItems() == 4) {
+                                        buffer.loadFromFile("assets/sound/Shield.ogg");
+                                    }
                                 }
 
                             }
@@ -653,6 +688,9 @@ int main()
                                     //cout << i << " " << enemies_list[i].getCurrentHP() << endl;
                                     enemies_list[i].setHitCount(8);
                                 }
+                            }
+                            else if (player.getSelectedItems() == 4) {
+                                player.setInvincibleTimer(5.0f);
                             }
                         }
                     }
@@ -680,8 +718,10 @@ int main()
                     elapsedCDTime_SelectedItem.restart();
                     elapsedCDTime_StrengthTimer.restart();
                     elapsedCDTime_SpeedTimer.restart();
+                    elapsedCDTime_InvincibleTimer.restart();
                     elapsedCDTime_Esc.restart();
                     elapsedCDTime_NextWave.restart();
+                    elapsedCDTime_AgressiveMode.restart();
                     deltaTime = 0;
                     isPause = !isPause;
                     cd_esc = 0.5f;
@@ -785,12 +825,30 @@ int main()
 
             for (int i = 0; i < (int)effect_list.size(); i++) {
                 if (!isPause && !player.isDead()) {
-                    effect_list[i].update(deltaTime);
+                 
+
+                    if (effect_list[i].getEffectType() == 1) {
+                        effect_list[i].update(deltaTime/1.5);
+                        sf::CircleShape circle;
+                        circle.setRadius(100);
+                        circle.setFillColor(sf::Color(240, 75, 75, effect_list[i].getTransparentRemove()));
+                        sf::Vector2f tempPos(effect_list[i].getPos().x-40, effect_list[i].getPos().y-40);
+                        circle.setPosition(tempPos);
+                        circle.setOrigin(circle.getRadius() / 2, circle.getRadius() / 2);
+                        effect_list[i].removeTransparentRemove(10);
+                        windowRender.draw(circle);
+                    } else {
+                        effect_list[i].update(deltaTime);
+                    }
+
+
+
                     if (effect_list[i].ISCanRemove()) {
                         effect_list.erase(effect_list.begin() + i);
                         continue;
                     }
                 }
+               
                 windowRender.draw(effect_list[i].getBody());
             }
 
@@ -868,6 +926,18 @@ int main()
             windowRender.draw(MapBackgroundAssest);
             ScoreBoard.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1050, 0)));
             windowRender.draw(ScoreBoard);
+            ClockTimerSprite.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1130, 60)));
+            ClockTimerSprite.setOrigin(ClockTimerSprite.getSize() / 2.0f);
+
+            if (WaveController.getAgressiveModeTimer() >= 0) {
+                ClockTimerSprite.setRotation(rotation_a - (((30 - WaveController.getAgressiveModeTimer()) * 6)));
+            } else {
+                ClockTimerSprite.setRotation(180);
+            }
+
+           // cout << (((30 - WaveController.getAgressiveModeTimer()) * 6)) << endl;
+          
+            windowRender.draw(ClockTimerSprite);
             updateScoreToText(score_text_list);
 
             text_list[1].setString(IntToString(WaveController.getCurrentWave()));
@@ -907,6 +977,9 @@ int main()
             else if (player.getSelectedItems() == 3) {
                 Items.setTexture(&items_nuke);
             }
+            else if (player.getSelectedItems() == 4) {
+                Items.setTexture(&items_shield);
+            }
 
             windowRender.draw(Items);
             windowRender.draw(text_list[2]);
@@ -927,8 +1000,10 @@ int main()
                         elapsedCDTime_SelectedItem.restart();
                         elapsedCDTime_StrengthTimer.restart();
                         elapsedCDTime_SpeedTimer.restart();
+                        elapsedCDTime_InvincibleTimer.restart();
                         elapsedCDTime_Esc.restart();
                         elapsedCDTime_NextWave.restart();
+                        elapsedCDTime_AgressiveMode.restart();
                         deltaTime = 0;
                         if (sound_nextR.getStatus() == sf::Sound::Status::Paused) {
                             sound_nextR.play();
@@ -960,8 +1035,10 @@ int main()
                         elapsedCDTime_SelectedItem.restart();
                         elapsedCDTime_StrengthTimer.restart();
                         elapsedCDTime_SpeedTimer.restart();
+                        elapsedCDTime_InvincibleTimer.restart();
                         elapsedCDTime_Esc.restart();
                         elapsedCDTime_NextWave.restart();
+                        elapsedCDTime_AgressiveMode.restart();
                     }
                     restartMenu.loadFromFile("assets/texture/Restart_B.png");
                     if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
@@ -1027,6 +1104,7 @@ int main()
                         isGameStart = false;
                         view_lobby.setCenter(640, 925 / 2.0f);
                         deltaTime = 0.0f;
+                        cd_click = 0.5f;
                         saveScore(playerInput, player.getScore());
                     }
                     backToLobby.loadFromFile("assets/texture/back_A.png");
@@ -1117,8 +1195,10 @@ int main()
                     elapsedCDTime_SelectedItem.restart();
                     elapsedCDTime_StrengthTimer.restart();
                     elapsedCDTime_SpeedTimer.restart();
+                    elapsedCDTime_InvincibleTimer.restart();
                     elapsedCDTime_Esc.restart();
                     elapsedCDTime_NextWave.restart();
+                    elapsedCDTime_AgressiveMode.restart();
                     isSelectName = false;
                     if (playerInput.getSize() <= 0) {
                         playerInput = "INPUT_NAME_TH";
@@ -1254,6 +1334,13 @@ int main()
 
             if (music_day.getStatus() == sf::Music::Status::Playing) {
                 music_day.stop();
+            }
+
+            if (music_Hard.getStatus() == sf::Music::Status::Playing) {
+                music_Hard.stop();
+            }
+
+            if (music.getStatus() == sf::Music::Status::Stopped) {
                 music.play();
             }
 
@@ -1339,6 +1426,11 @@ int main()
             windowRender.draw(ScoreUI);
             windowRender.draw(HowUI);
             windowRender.draw(ExitUI);
+        }
+
+        if (WaveController.isAgressiveMode() && !isPause && !player.isDead()) {
+            AGRESSIVE_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(0, 0)));
+            windowRender.draw(AGRESSIVE_UI);
         }
         windowRender.display();
     }

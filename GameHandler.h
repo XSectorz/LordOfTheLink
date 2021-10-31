@@ -21,10 +21,14 @@ extern vector<Effect> effect_list;
 extern vector<Items> items_list;
 extern sf::Texture mobTexture;
 extern sf::Texture mobTexture_2;
+extern sf::Texture mobTexture_3;
+extern sf::Texture mobTexture_4;
+extern sf::Texture mobTexture_5;
 extern sf::Texture items_hp_potion;
 extern sf::Texture items_strength_potion;
 extern sf::Texture items_speed_potion;
 extern sf::Texture items_nuke;
+extern sf::Texture items_shield;
 extern sf::Texture resumeMenu;
 extern sf::SoundBuffer buffer_hit_person;
 extern sf::Sound sound_hit_person;
@@ -40,6 +44,8 @@ extern sf::SoundBuffer buffer_shot;
 extern sf::Sound sound_shot;
 extern sf::SoundBuffer buffer_pickup;
 extern sf::Sound sound_pickup;
+extern sf::SoundBuffer buffer_block;
+extern sf::Sound sound_block;
 extern sf::Texture restartMenu;
 extern sf::Texture quitMenu;
 extern sf::Texture MainMenu;
@@ -57,8 +63,12 @@ extern sf::Texture HomeButton;
 extern sf::Texture backToLobby;
 extern sf::Texture HowtoPlay;
 extern sf::Texture BacktoMain;
+extern sf::Texture ClockTimer;
 extern float cooldownNext;
 extern bool isNext;
+extern float Damage_Wizard;
+extern sf::Music music_day;
+extern sf::Music music_Hard;
 
 class MapHandler
 {

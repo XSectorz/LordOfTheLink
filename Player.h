@@ -39,6 +39,8 @@ public:
 	void removeItem(int index) { this->ItemCount[index] -= 1; }
 	void setSpeed(float speed) { this->speed = speed; }
 	float getSpeed() { return this->speed; }
+	float getInvincibleTimer() { return this->invincible_timer; }
+	void setInvincibleTimer(float invincible_timer) { this->invincible_timer = invincible_timer; }
 	int getItems(int index) { return this->ItemCount[index]; }
 	int getSelectedItems() { return this->selectedItems;  }
 	void nextSelectedItems();
@@ -57,13 +59,14 @@ private:
 	unsigned int row;
 	float strength_timer = 0.0f;
 	float speed_timer = 0.0f;
+	float invincible_timer = 0.0f;
 	float speed;
 	float health = 100;
 	float cd_shot = 0.25;
 	bool Death = false;
 	int score = 0;
 	int selectedItems = 0;
-	int ItemCount[4] = {0,0,0,0};
+	int ItemCount[5] = {0,0,0,0,0};
 	sf::Vector2f prevPos;
 	Animation animation;
 };
