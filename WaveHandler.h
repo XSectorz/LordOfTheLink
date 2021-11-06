@@ -19,6 +19,7 @@ public:
 	void setAgressiveModeTimer(float agressiveMode) { this->agressiveMode = agressiveMode; }
 	bool isAgressiveMode() { return this->isOnAgressiveMode; }
 	void setAgressiveMode(bool isAgress) { this->isOnAgressiveMode = isAgress; }
+	void spawnItemsPosition(float x, float y);
 
 private:
 	int CurrentWave = 0;

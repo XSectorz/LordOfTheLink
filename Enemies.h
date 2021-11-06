@@ -12,7 +12,7 @@ class Enemies
 
 public:
 
-	Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,float damage,int score,EnemyType enemyType);
+	Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime,float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,float damage,int score,EnemyType enemyType,float luckycharm);
 
 	void Update(sf::Vector2f playerPosition, float deltaTime_Enemy);
 	void Test(float deltaTime_Enemy);
@@ -28,6 +28,7 @@ public:
 	int getAnimationType(sf::Vector2f EnemyPosition, sf::Vector2f playerPosition);
 	int getAnimationHit(int currentAnimation);
 	int getCurrentDeathAnimation() { return this->currentDeathAnimation;  }
+	int getLuckyCharm() { return this->luckycharm; }
 	int getScore() { return this->score; }
 	void deathEvent();
 	void setCurrentDeathAnimation(int currentDeathAnimation) { this->currentDeathAnimation = currentDeathAnimation; }
@@ -46,6 +47,7 @@ private:
 	int currentDeathAnimation = 8;
 	int score = 0;
 	float damage = 0;
+	float luckycharm = 0;
 	EnemyType enemyType;
 	sf::RectangleShape body;
 	sf::RectangleShape hitbox;

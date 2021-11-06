@@ -532,6 +532,7 @@ int main()
     bool isPause = false;
     WalkTypes walkType;
     int RotationType = 0; //Default
+    int monster_counter = 0;
 
     bool isGameStart = false;
     bool isSelectName = false;
@@ -926,6 +927,15 @@ int main()
             windowRender.draw(MapBackgroundAssest);
             ScoreBoard.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1050, 0)));
             windowRender.draw(ScoreBoard);
+
+            sf::Text MCount;
+            monster_counter = enemies_list.size();
+            MCount.setCharacterSize(23);
+            MCount.setFillColor(sf::Color(124, 0, 6));
+            MCount.setFont(font);
+            MCount.setString("MOBS : " + IntToString(monster_counter));
+            MCount.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1150, 15)));
+            windowRender.draw(MCount);
             ClockTimerSprite.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1130, 60)));
             ClockTimerSprite.setOrigin(ClockTimerSprite.getSize() / 2.0f);
 

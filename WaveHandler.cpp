@@ -23,20 +23,43 @@ void spawnEnemies(vector<Enemies>& enemies_list, int mobsType) {
 	//cout << "Spawn at: " << spawnPos[Index].x << "," << spawnPos[Index].y << endl;
 
 	if (mobsType == 0) {
-		Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.6f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x-0.25f, speed_y-0.25f), 40, 40, 3, 8, EnemyType::NORMAL); //Enemy Type 1
+		Enemies enemy(&mobTexture, sf::Vector2u(3, 10), 0.6f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x-0.25f, speed_y-0.25f), 40, 40, 3, 8, EnemyType::NORMAL,85); //Enemy Type 1
 		enemies_list.push_back(enemy);
 	} else if (mobsType == 1) {
-		Enemies enemy(&mobTexture_2, sf::Vector2u(5, 10), 0.45f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x+0.2f, speed_y+0.2f), 30, 30, 4, 15, EnemyType::RANGED); //Enemy Type 2
+		Enemies enemy(&mobTexture_2, sf::Vector2u(5, 10), 0.45f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x+0.2f, speed_y+0.2f), 30, 30, 4, 15, EnemyType::RANGED,5); //Enemy Type 2
 		enemies_list.push_back(enemy);
 	} else if (mobsType == 2) {
-		Enemies enemy(&mobTexture_3, sf::Vector2u(6, 10), 0.3f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 150, 150, 10, 100, EnemyType::MINI_BOSS); //Enemy Type 3
+		Enemies enemy(&mobTexture_3, sf::Vector2u(6, 10), 0.3f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 150, 150, 10, 100, EnemyType::MINI_BOSS,10); //Enemy Type 3
 		enemies_list.push_back(enemy);
 	} else if (mobsType == 3) {
-		Enemies enemy(&mobTexture_4, sf::Vector2u(6, 10), 0.45f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 80, 80, 5, 20, EnemyType::KNIGHT); //Enemy Type 4
+		Enemies enemy(&mobTexture_4, sf::Vector2u(6, 10), 0.45f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 80, 80, 5, 20, EnemyType::KNIGHT,5); //Enemy Type 4
 		enemies_list.push_back(enemy);
 	} else if (mobsType == 4) {
-		Enemies enemy(&mobTexture_5, sf::Vector2u(4, 10), 1.f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 70, 70, Damage_Wizard, 20, EnemyType::WIZARD); //Enemy Type 5
+		Enemies enemy(&mobTexture_5, sf::Vector2u(4, 10), 1.f, 80.0f, 100.0f, spawnPos[Index].x, spawnPos[Index].y, sf::Vector2f(speed_x + 0.25f, speed_y + 0.25f), 70, 70, Damage_Wizard, 20, EnemyType::WIZARD,10); //Enemy Type 5
 		enemies_list.push_back(enemy);
+	}
+}
+
+void WaveHandler::spawnItemsPosition(float x,float y) {
+	sf::Vector2f spawnPos= { x,y };
+
+	int randItemType = (int)(rand() % (4) + 0);
+
+	if (randItemType == 0) {
+		Items items(&items_hp_potion, spawnPos, 0);
+		items_list.push_back(items);
+	} else if (randItemType == 1) {
+		Items items(&items_strength_potion, spawnPos, 1);
+		items_list.push_back(items);
+	} else if (randItemType == 2) {
+		Items items(&items_speed_potion, spawnPos, 2);
+		items_list.push_back(items);
+	} else if (randItemType == 3) {
+		Items items(&items_nuke, spawnPos, 3);
+		items_list.push_back(items);
+	} else if (randItemType == 4) {
+		Items items(&items_shield, spawnPos, 4);
+		items_list.push_back(items);
 	}
 }
 

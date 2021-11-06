@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,float damage,int score, EnemyType enemyType) :
+Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime, float size_x, float size_y, float pos_x, float pos_y, sf::Vector2f speed, float MaxHP, float CurrentHP,float damage,int score, EnemyType enemyType,float luckycharm) :
 	animation(texture, imageCount, switchTime, 80, 100)
 {
 	this->body.setSize(sf::Vector2f(size_x, size_y));
@@ -24,10 +24,17 @@ Enemies::Enemies(sf::Texture* texture, sf::Vector2u imageCount, float switchTime
 	this->enemyType = enemyType;
 	this->damage = damage;
 	this->score = score;
+	this->luckycharm = luckycharm;
 }
 
 void Enemies::deathEvent() {
 	
+	int chance = (int)(rand() % (100) + 0);
+
+	if (chance >= (95-this->luckycharm)) { //ITEM DROP
+		WaveController.spawnItemsPosition(body.getPosition().x, body.getPosition().y);
+		cout << "ITEM DROP" << endl;
+	}
 
 	if (enemies_list.size() == 1) { //DEATH LAST GO TO NEXT ROUND
 		isNext = true;
@@ -35,6 +42,7 @@ void Enemies::deathEvent() {
 		sound_nextR.play();
 		WaveController.setAgressiveMode(false);
 		WaveController.setAgressiveModeTimer(30);
+
 		if (music_Hard.getStatus() == sf::SoundSource::Status::Playing) {
 			music_day.play();
 			music_Hard.stop();
