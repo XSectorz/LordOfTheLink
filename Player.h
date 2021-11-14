@@ -33,6 +33,8 @@ public:
 		}
 	}
 	void setHealth(float health) { this->health = health;  }
+	void setMana(float mana) { this->mana = mana; }
+	float getMana() { return this->mana; }
 	int getScore() { return this->score;  }
 	void addScore(int score) { this->score += score; }
 	void addItem(int index) { this->ItemCount[index] += 1; }
@@ -62,6 +64,7 @@ private:
 	float invincible_timer = 0.0f;
 	float speed;
 	float health = 100;
+	float mana = 0;
 	float cd_shot = 0.25;
 	bool Death = false;
 	int score = 0;

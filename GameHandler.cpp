@@ -56,6 +56,9 @@ sf::Sound sound_pickup;
 sf::Texture HowtoPlay;
 sf::Music music_day;
 sf::Music music_Hard;
+sf::Texture ManaBar;
+sf::SoundBuffer buffer_shot_heavy;
+sf::Sound sound_shot_heavy;
 float Damage_Wizard = 10;
 
 

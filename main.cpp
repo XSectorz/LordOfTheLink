@@ -47,6 +47,14 @@ public:
     sf::Vector2f currVelocity;
     sf::Vector2f size;
     float maxSpeed;
+    void setIsEnchanted(bool isEnchanted) {
+        this->isEnchanted
+            = isEnchanted
+            ;
+    }
+    bool isEnchant() {
+        return this->isEnchanted;
+    }
 
     Arrow()
         : currVelocity(0.f, 0.f), maxSpeed(15.f)
@@ -58,7 +66,10 @@ public:
       //  this->arrow.setFillColor(sf::Color::Red);
     };
 
+
     Collider GetCollinder() { return Collider(arrow_obj); }
+private:
+    bool isEnchanted = false;
 
 };
 
@@ -323,6 +334,7 @@ int main()
     HowtoPlay.loadFromFile("assets/texture/howtoPlay.png");
     BacktoMain.loadFromFile("assets/texture/back.png");
     ClockTimer.loadFromFile("assets/texture/ClockTimer.png");
+    ManaBar.loadFromFile("assets/test/MANA_BAR.png");
 
     /* SOUND */
     sf::Music music;
@@ -350,6 +362,7 @@ int main()
     buffer_shot.loadFromFile("assets/sound/bow_shoot.ogg");
     buffer_pickup.loadFromFile("assets/sound/pickup_items.ogg");
     buffer_block.loadFromFile("assets/sound/Shield.ogg");
+    buffer_shot_heavy.loadFromFile("assets/sound/LASER_SHOT.ogg");
 
     sound_hit_enemies.setBuffer(buffer_hit_enemies);
     sound_hit_person.setBuffer(buffer_hit_person);
@@ -359,6 +372,7 @@ int main()
     sound_shot.setBuffer(buffer_shot);
     sound_pickup.setBuffer(buffer_pickup);
     sound_block.setBuffer(buffer_block);
+    sound_shot_heavy.setBuffer(buffer_shot_heavy);
 
     sound_hit_enemies.setVolume(20.f);
     sound_nextR.setVolume(20.f);
@@ -367,6 +381,7 @@ int main()
     sound_shot.setVolume(20.f);
     sound_pickup.setVolume(20.f);
     sound_block.setVolume(20.f);
+    sound_shot_heavy.setVolume(20.f);
 
     /* SETTING GAME*/
     sf::RectangleShape MapBackground(sf::Vector2f(1920.0f, 1920.0f));
@@ -414,8 +429,6 @@ int main()
     result_UI.setTexture(&resultUI);
     sf::RectangleShape backButtonUI(sf::Vector2f(350.0f, 150.0f));
     backButtonUI.setTexture(&backToLobby);
-    sf::RectangleShape backToMain_HOW(sf::Vector2f(350.0f, 150.0f));
-    backToMain_HOW.setTexture(&BacktoMain);
 
     sf::RectangleShape PAUSE_UI(sf::Vector2f(1280.0f, 925.0f));
     PAUSE_UI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(0, 0)));
@@ -449,13 +462,13 @@ int main()
     sf::Vector2f mousePosWindow;
     sf::Vector2f aimDir;
     sf::Vector2f aimDirNorm;
-    Arrow arrow1;
 
     //Enemies enemy(&mobTexture, sf::Vector2u(4, 4), 0.3f, 51.0f, 90.0f, 700, 400, sf::Vector2f(2.0f, 2.0f));
     //Enemies enemy(&mobTexture, sf::Vector2u(5, 10), 0.3f, 80.0f, 100.0f, 700, 500, sf::Vector2f(2.0f, 2.0f), 100, 100, 5, 10,EnemyType::RANGED); //Enemy type 1
 
     /* DYNAMIC BAR */
-    DynamicBar HP_BAR(&hp_bar, sf::Vector2f(300.0f,75.0f),230.0f,50.0f);
+    DynamicBar HP_BAR(&hp_bar, sf::Vector2f(300.0f,75.0f),230.0f,50.0f,0);
+    DynamicBar MANA_BAR(&ManaBar, sf::Vector2f(300.0f, 75.0f), 250.0f, 50.0f, 1);
 
     /* TEXT */
     sf::Font font;
@@ -770,11 +783,19 @@ int main()
                             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 
                                 if (!isPause && !player.isDead()) {
+                                    Arrow arrow1;
                                     arrow1.arrow_obj.setPosition(playerCenter);
                                     arrow1.currVelocity = aimDirNorm * arrow1.maxSpeed;
                                     arrow1.arrow_obj.setRotation(rotation + 360);
+                                    if (player.getMana() >= 150) {
+                                        arrow1.setIsEnchanted(true);
+                                        player.setMana(0);
+                                        sound_shot_heavy.play();
+                                    } else {
+                                        sound_shot.play();
+                                    }
                                     arrows.push_back(Arrow(arrow1));
-                                    sound_shot.play();
+                                    
 
                                     if (player.getStrengthTimer() < 0) {
                                         player.setCDShot(0.25f);
@@ -913,8 +934,11 @@ int main()
                             }
 
                             isHitEnemy = true;
-                            arrows.erase(arrows.begin() + i);
-                            break;
+                            if (!arrows[i].isEnchant()) {
+                                arrows.erase(arrows.begin() + i);
+                                player.setMana(player.getMana() + 5);
+                                break;
+                            }
                         }
                     }
                 }
@@ -969,7 +993,9 @@ int main()
             windowRender.draw(text_list[1]);
 
             HP_BAR.Update();
+            MANA_BAR.Update();
             windowRender.draw(HP_BAR.getBody());
+            windowRender.draw(MANA_BAR.getBody());
 
             SelectedUI.setPosition(windowRender.mapPixelToCoords(sf::Vector2i(1000, 700)));
             windowRender.draw(SelectedUI);
@@ -1068,6 +1094,7 @@ int main()
                         isGameStart = false;
                         view_lobby.setCenter(640, 925 / 2.0f);
                         deltaTime = 0.0f;
+                        cd_click = 0.5f;
                     }
                     quitMenu.loadFromFile("assets/texture/Quit_B.png");
                     if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
@@ -1298,36 +1325,17 @@ int main()
                 }
             }
             HowToUI.setPosition(sf::Vector2f(0.0f, 0.0f));
-            backToMain_HOW.setPosition(sf::Vector2f(800.0f, 700.0f));
 
-            int isSelected = 0;
+            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
+                isSelectedMenu = true;
+                isHowto = false;
+                sound_xp_mc.play();
 
-            if (backToMain_HOW.getGlobalBounds().contains(mousePosWindow.x, mousePosWindow.y) && isSelected <= 0) {
-                if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && cd_click <= 0) {
-                    isHowto = false;
-                    cd_click = 0.5f;
-                }
-                BacktoMain.loadFromFile("assets/texture/back_A.png");
-                if (sound_xp_mc.getStatus() == sf::Sound::Status::Stopped) {
-
-                    if (!isSelectedMenu) {
-                        sound_xp_mc.play();
-                    }
-                    isSelectedMenu = true;
-                }
-                isSelected++;
-            } else {
-                BacktoMain.loadFromFile("assets/texture/back.png");
-            }
-
-            if (isSelected <= 0) {
-                isSelectedMenu = false;
             }
 
             windowRender.clear(sf::Color::Black);
 
             windowRender.draw(HowToUI);
-            windowRender.draw(backToMain_HOW);
         } else {
             while (windowRender.pollEvent(event)) {
                 if (event.type == sf::Event::Closed) {
